@@ -2,9 +2,13 @@ import { app, BrowserWindow } from "electron";
 import path from "path";
 import { isDev } from "./util.js";
 import { pollResources } from "./resourceManager.js";
+import { getPreloadPath } from "./pathResolver.js";
 
 app.whenReady().then(() => {
     const mainWindow = new BrowserWindow({
+        webPreferences: {
+            preload: getPreloadPath(),
+        },
         width: 800,
         height: 600,
     });
