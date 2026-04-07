@@ -1,0 +1,24 @@
+{
+    "appId": "com.cole.electron-system-telemetry",
+    "files": [
+        "dist-electron",
+        "dist-react"
+    ],
+    "mac": {
+        "target": [
+            "dmg"
+        ]
+    },
+    "win": {
+        "target": [
+            "portable",
+            "nsis"
+        ]
+    },
+    "linux": {
+        "target": [
+            "AppImage"
+        ],
+        "category": "Utility"
+    }
+}
