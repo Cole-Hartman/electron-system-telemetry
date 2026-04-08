@@ -1,15 +1,16 @@
 import osUtils from "os-utils";
 import os from "os";
 import fs from "fs";
+import { BrowserWindow } from "electron";
 
 const POLLING_INTERVAL = 500;
 
-export function pollResources() {
+export function pollResources(mainWindow: BrowserWindow) {
     setInterval(async () => {
         const cpuUsage = await getCpuUsage();
         const memoryUsage = getMemoryUsage();
         const diskUsage = getDiskUsage();
-        console.log("test: ", { cpuUsage, memoryUsage, diskUsage: diskUsage.usage })
+        mainWindow.webContents.send('statistics', { cpuUsage, memoryUsage, diskUsage: diskUsage.usage })
     }, POLLING_INTERVAL);
 
 }
