@@ -1,6 +1,4 @@
-# electron-system-telemetry
-
-A small **Electron** desktop app with a **React + Vite** UI. 
+A small Electron desktop app with a React + Vite UI. 
 
 The main node process polls CPU, memory, and disk usage and sends updates to the renderer over the IPC bus.
 
