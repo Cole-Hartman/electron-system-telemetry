@@ -5,6 +5,7 @@ import { BrowserWindow } from "electron";
 
 const POLLING_INTERVAL = 500;
 
+// Poll active resource utilization
 export function pollResources(mainWindow: BrowserWindow) {
     setInterval(async () => {
         const cpuUsage = await getCpuUsage();
@@ -15,6 +16,7 @@ export function pollResources(mainWindow: BrowserWindow) {
 
 }
 
+// General system info
 export function getStaticData() {
     const totalStorage = getDiskUsage().total;
     const cpuModel = os.cpus()[0].model;
