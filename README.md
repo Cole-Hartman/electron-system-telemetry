@@ -10,7 +10,7 @@ The UI can also request static machine info (CPU model, totals) via a handled ch
 - main & renderer process
 - preload scripts
   - IPC communication
-  - designin contextBridge API for safe browser node.js exposure
+  - designing contextBridge API for safe browser node.js exposure
 - the browsers rendering engine and the window object
 - electron type safety across IPC and contextBridge
 - packaging safely across mac, win, and linux with electron builder
