@@ -11,6 +11,7 @@ export function pollResources(mainWindow: BrowserWindow) {
         const cpuUsage = await getCpuUsage();
         const memoryUsage = getMemoryUsage();
         const diskUsage = getDiskUsage();
+        // Send statistics event to renderer
         mainWindow.webContents.send('statistics', { cpuUsage, memoryUsage, diskUsage: diskUsage.usage })
     }, POLLING_INTERVAL);
 

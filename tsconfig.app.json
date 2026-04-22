@@ -10,7 +10,7 @@
     ],
     "module": "ESNext",
     "types": [
-      "./types.d.ts", // add our global types
+      "./types", // add our global types
       "vite/client"
     ],
     "skipLibCheck": true,

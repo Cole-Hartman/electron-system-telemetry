@@ -20,6 +20,7 @@ app.whenReady().then(() => {
     } else {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"));
     }
+    // Starts polling resources and sending to renderer
     pollResources(mainWindow);
 });
 

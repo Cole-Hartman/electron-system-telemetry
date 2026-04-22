@@ -1,7 +1,10 @@
+// the root tsconfig file
+// doesn't do anything, just references the other tsconfig files
 {
   "files": [],
   "references": [
     {
+      // config for the react app
       "path": "./tsconfig.app.json"
     },
     {
