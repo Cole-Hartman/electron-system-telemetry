@@ -14,6 +14,7 @@ type StaticData = {
     totalMemoryGB: number;
 };
 
+// Type for type safe adapter pattern
 type EventPayloadMapping = {
     statistics: Statistics;
     getStaticData: StaticData;

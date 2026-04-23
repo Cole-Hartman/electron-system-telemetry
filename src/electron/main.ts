@@ -1,11 +1,11 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import { isDev } from "./util.js";
+import { isDev, ipcMainHandle } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getPreloadPath } from "./pathResolver.js";
 
 app.whenReady().then(() => {
-    ipcMain.handle("getStaticData", () => getStaticData());
+    ipcMainHandle("getStaticData", () => getStaticData());
 
     const mainWindow = new BrowserWindow({
         webPreferences: {
