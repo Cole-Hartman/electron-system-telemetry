@@ -5,9 +5,12 @@ function App() {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    window.electron.subscribeStatistics((stats) => {
+    // when this hook stops, we want to unsubscribe from the statistics
+    const unsubscribe = window.electron.subscribeStatistics((stats) => {
       console.log(stats);
     });
+    // react calls the function when the hook stops
+    return unsubscribe;
   }, []);
 
   return (

@@ -31,10 +31,12 @@ interface Window {
     electron: {
         // subscribeStatistics is a function that takes a callback and returns void 
         // the callback takes a statistics object and returns void
-        subscribeStatistics: (callback: (statistics: Statistics) => void) => void;
+        subscribeStatistics: (callback: (statistics: Statistics) => void) => UnsubscribeFunction;
         // getStaticData is a function that returns a promise that
         // the promise uses a generic, and we pass in StaticData as the generic
         getStaticData: () => Promise<StaticData>;
     }
 }
+
+type UnsubscribeFunction = () => void;
 
