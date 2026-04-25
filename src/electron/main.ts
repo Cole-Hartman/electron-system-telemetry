@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain, session } from "electron";
+import { app, BrowserWindow, ipcMain, session, Menu, Tray } from "electron";
 import path from "path";
 import { isDev, ipcMainHandle } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
-import { getPreloadPath, getUIPath } from "./pathResolver.js";
+import { getAssetsPath, getPreloadPath, getUIPath } from "./pathResolver.js";
 
 app.whenReady().then(() => {
     ipcMainHandle("getStaticData", () => getStaticData());
@@ -25,5 +25,7 @@ app.whenReady().then(() => {
     }
     // Starts polling resources and sending to renderer
     pollResources(mainWindow);
+
+    new Tray(path.join(getAssetsPath(), process.platform === 'darwin' ? 'trayIconTemplate.png' : 'trayIcon.png'))
 });
 
