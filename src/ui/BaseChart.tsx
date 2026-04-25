@@ -14,6 +14,7 @@ type BaseChartProps = {
 };
 
 export function BaseChart(props: BaseChartProps) {
+    console.log(props.data);
     return (
         <ResponsiveContainer width={'100%'} height={'100%'}>
             <AreaChart data={props.data}>

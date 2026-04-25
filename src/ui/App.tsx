@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react'
-import { BaseChart } from './BaseChart.tsx'
+import { useMemo } from 'react'
+import { Chart } from './Chart.tsx'
 import { useStatistics } from './useStatistics.ts'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0);
   const statistics = useStatistics(100);
+  const cpuUsages = useMemo(() => statistics.map(stat => stat.cpuUsage), [statistics]);
 
   return (
     <>
       <section id="center">
-        hello
-      </section>
+        <div style={{ height: 200, width: 1000 }}>
+          <Chart data={cpuUsages} maxDataPoints={10} />
+        </div>
+      </section >
       <section id="spacer"></section>
     </>
   )
