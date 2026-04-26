@@ -3,6 +3,7 @@ import path from "path";
 import { isDev, ipcMainHandle } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getAssetsPath, getPreloadPath, getUIPath } from "./pathResolver.js";
+import { createTray } from "./tray.js";
 
 app.whenReady().then(() => {
     ipcMainHandle("getStaticData", () => getStaticData());
@@ -26,6 +27,33 @@ app.whenReady().then(() => {
     // Starts polling resources and sending to renderer
     pollResources(mainWindow);
 
-    new Tray(path.join(getAssetsPath(), process.platform === 'darwin' ? 'trayIconTemplate.png' : 'trayIcon.png'))
+    createTray(mainWindow);
+
+    handleCloseEvents(mainWindow);
 });
+
+function handleCloseEvents(mainWindow: BrowserWindow) {
+    let willClose = false;
+
+    mainWindow.on('close', (event) => {
+        if (willClose) {
+            return;
+        }
+        event.preventDefault();
+        mainWindow.hide();
+        if (app.dock) {
+            app.dock.hide();
+        }
+    });
+
+    // calling app.quit by quitting the app
+    app.on('before-quit', () => {
+        willClose = true;
+    })
+
+    mainWindow.on('show', () => {
+        willClose = false;
+    })
+}
+
 
