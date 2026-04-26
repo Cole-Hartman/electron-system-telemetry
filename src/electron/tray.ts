@@ -1,3 +1,7 @@
+/**
+ * Function to create the tray icon
+ */
+
 import { app, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
 import { getAssetsPath } from "./pathResolver.js";

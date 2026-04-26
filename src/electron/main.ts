@@ -32,6 +32,17 @@ app.whenReady().then(() => {
     handleCloseEvents(mainWindow);
 });
 
+/**
+ * Handle the quitting events of the main window
+ * Allows the user to close the window without quitting the app
+ * 
+ * Ways of closing the app and their event order:
+ * 1. Closing main window manually: 'close' event ->'before-quit' event -> app quits
+ *    - on manual close, prevent the app from quitting and hide the window
+ * 
+ * 2. Clicking the close button (app.quit()): 'before-quit' event -> 'close' event -> app quits
+ *    - on quit, allow the app to quit
+ */
 function handleCloseEvents(mainWindow: BrowserWindow) {
     let willClose = false;
 
@@ -39,6 +50,8 @@ function handleCloseEvents(mainWindow: BrowserWindow) {
         if (willClose) {
             return;
         }
+
+        // prevent the window from quitting and hide it
         event.preventDefault();
         mainWindow.hide();
         if (app.dock) {
