@@ -5,6 +5,9 @@ electron.contextBridge.exposeInMainWorld('electron', {
         // Listens for statistics event from main and calls callback
         return ipcOn("statistics", (stats) => { callback(stats) });
     },
+    subscribeChangeView: (callback) => {
+        return ipcOn("changeView", (stats) => { callback(stats) });
+    },
     getStaticData: () => ipcInvoke("getStaticData"),
 } satisfies Window['electron']);
 /**

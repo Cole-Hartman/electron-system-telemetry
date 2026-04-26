@@ -56,8 +56,6 @@ export function validateEventFrame(frame: WebFrameMain | null) {
  * Same concept as ipcHandle, but for webContents.send
  */
 export function ipcWebContentsSend<Key extends keyof EventPayloadMapping>(
-    key: Key,
-    webContents: WebContents,
-    payload: EventPayloadMapping[Key]) {
+    key: Key, webContents: WebContents, payload: EventPayloadMapping[Key]) {
     webContents.send(key, payload)
 }

@@ -14,14 +14,17 @@ type StaticData = {
     totalMemoryGB: number;
 };
 
+type View = 'CPU' | 'RAM' | 'DISK';
+
 // Type for type safe adapter pattern
 type EventPayloadMapping = {
     statistics: Statistics;
     getStaticData: StaticData;
+    changeView: View
 }
 
 /*
-Anytime we try to access a new window property, typescript will comlain.
+Anytime we try to access a new window property, typescript will complain.
 The window is just an object, and typescript doesn't know about our new electron property.
 When my React code tries to call window.electron.getStaticData(), TypeScript would 
 complain: "Property 'electron' does not exist on type 'Window'".
@@ -35,6 +38,7 @@ interface Window {
         // getStaticData is a function that returns a promise that
         // the promise uses a generic, and we pass in StaticData as the generic
         getStaticData: () => Promise<StaticData>;
+        subscribeChangeView: (callback: (view: View) => void) => UnsubscribeFunction;
     }
 }
 

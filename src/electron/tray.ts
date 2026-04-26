@@ -1,10 +1,10 @@
-/**
- * Function to create the tray icon
- */
-
 import { app, BrowserWindow, Menu, Tray } from "electron";
 import path from "path";
 import { getAssetsPath } from "./pathResolver.js";
+
+/**
+ * Function to create the tray
+ */
 
 export function createTray(mainWindow: BrowserWindow) {
     const tray = new Tray(path.join(getAssetsPath(), process.platform === 'darwin' ? 'trayIconTemplate.png' : 'trayIcon.png'))
@@ -19,5 +19,8 @@ export function createTray(mainWindow: BrowserWindow) {
 
             }
         },
+        {
+            label: 'Quit', type: 'radio', click: () => app.quit()
+        }
     ]))
 }

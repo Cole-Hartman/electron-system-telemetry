@@ -4,6 +4,7 @@ import { isDev, ipcMainHandle } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getAssetsPath, getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
+import { createMenu } from "./menu.js";
 
 app.whenReady().then(() => {
     ipcMainHandle("getStaticData", () => getStaticData());
@@ -28,6 +29,7 @@ app.whenReady().then(() => {
     pollResources(mainWindow);
 
     createTray(mainWindow);
+    createMenu(mainWindow);
 
     handleCloseEvents(mainWindow);
 });
