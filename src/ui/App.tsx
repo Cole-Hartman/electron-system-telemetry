@@ -33,12 +33,16 @@ function App() {
 
   return (
     <>
-      <section id="center">
+      <div className="App">
+        <header>
+          <button id="close" onClick={() => window.electron.sendFrameAction('CLOSE')} />
+          <button id="minimize" onClick={() => window.electron.sendFrameAction('MINIMIZE')} />
+          <button id="maximize" onClick={() => window.electron.sendFrameAction('MAXIMIZE')} />
+        </header>
         <div style={{ height: 200, width: 1000 }}>
           <Chart data={activeUsages} maxDataPoints={10} />
         </div>
-      </section >
-      <section id="spacer"></section>
+      </div>
     </>
   )
 }

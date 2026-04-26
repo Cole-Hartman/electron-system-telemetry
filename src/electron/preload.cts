@@ -6,25 +6,28 @@ electron.contextBridge.exposeInMainWorld('electron', {
         return ipcOn("statistics", (stats) => { callback(stats) });
     },
     subscribeChangeView: (callback) => {
-        return ipcOn("changeView", (stats) => { callback(stats) });
+        return ipcOn("changeView", (view) => { callback(view) });
     },
     getStaticData: () => ipcInvoke("getStaticData"),
+    sendFrameAction: (payload) => {
+        ipcSend("sendFrameAction", payload)
+    }
 } satisfies Window['electron']);
-/**
-* satisfies - tells TS to expect this object to match type x. 
-* In this case, this object is untyped. So we link it to our existing Window interface.
-*/
+// satisfies - tells TS to expect this object to match type x. 
+// In this case, this object is untyped. So we link it to our existing Window interface.
 
 /**
- * Type safe adapter pattern
- * Same pattern we implemented for the backend in utils.ts
- */
+* ------------------------------------------------------------
+* TYPE SAFE ADAPTER PATTERN
+* ------------------------------------------------------------
+* Mirror pattern implemented for the backend in ./utils.ts
+*/
+
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
     key: Key,
 ): Promise<EventPayloadMapping[Key]> {
     return electron.ipcRenderer.invoke(key);
 }
-
 
 function ipcOn<Key extends keyof EventPayloadMapping>(
     key: Key,
@@ -36,3 +39,8 @@ function ipcOn<Key extends keyof EventPayloadMapping>(
     // return a unsubscribe function so react can unsubscribe from the event 
     return () => electron.ipcRenderer.off(key, cb);
 }
+
+function ipcSend<Key extends keyof EventPayloadMapping>(
+    key: Key, payload: EventPayloadMapping[Key]) {
+    electron.ipcRenderer.send(key, payload);
+} 

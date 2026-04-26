@@ -16,11 +16,14 @@ type StaticData = {
 
 type View = 'CPU' | 'RAM' | 'DISK';
 
+type FrameWindowAction = 'CLOSE' | 'MINIMIZE' | 'MAXIMIZE';
+
 // Type for type safe adapter pattern
 type EventPayloadMapping = {
     statistics: Statistics;
     getStaticData: StaticData;
-    changeView: View
+    changeView: View;
+    sendFrameAction: FrameWindowAction;
 }
 
 /*
@@ -39,6 +42,7 @@ interface Window {
         // the promise uses a generic, and we pass in StaticData as the generic
         getStaticData: () => Promise<StaticData>;
         subscribeChangeView: (callback: (view: View) => void) => UnsubscribeFunction;
+        sendFrameAction: (payload: FrameWindowAction) => void;
     }
 }
 

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, session, Menu, Tray } from "electron";
 import path from "path";
-import { isDev, ipcMainHandle } from "./util.js";
+import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getAssetsPath, getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
@@ -8,6 +8,19 @@ import { createMenu } from "./menu.js";
 
 app.whenReady().then(() => {
     ipcMainHandle("getStaticData", () => getStaticData());
+    ipcMainOn("sendFrameAction", (action) => {
+        switch (action) {
+            case 'CLOSE':
+                mainWindow.close();
+                break;
+            case 'MINIMIZE':
+                mainWindow.minimize();
+                break;
+            case 'MAXIMIZE':
+                mainWindow.maximize();
+                break;
+        }
+    })
 
     const mainWindow = new BrowserWindow({
 
@@ -17,6 +30,7 @@ app.whenReady().then(() => {
         },
         width: 800,
         height: 600,
+        frame: false, // remove the default window frame, I created my own
     });
 
     // Either load React or the built React app

@@ -2,6 +2,11 @@ import { app, Menu } from "electron";
 import { BrowserWindow } from "electron";
 import { isDev, ipcWebContentsSend } from "./util.js";
 
+/**
+ * Creates the application menu for the main window.
+ * - Allows use to select the active view
+ */
+
 export function createMenu(mainWindow: BrowserWindow) {
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
