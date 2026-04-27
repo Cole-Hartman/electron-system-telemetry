@@ -1,22 +1,43 @@
-import { BaseChart } from './BaseChart'
-import { useMemo } from 'react'
+import { useMemo } from 'react';
+import { BaseChart } from './BaseChart';
 
 export type ChartProps = {
     data: number[];
     maxDataPoints: number;
-}
+    selectedView: 'CPU' | 'RAM' | 'DISK';
+};
+
+export const COLOR_MAP = {
+    CPU: {
+        stroke: '#5DD4EE',
+        fill: '#0A4D5C',
+    },
+    RAM: {
+        stroke: '#E99311',
+        fill: '#5F3C07',
+    },
+    DISK: {
+        stroke: '#1ACF4D',
+        fill: '#0B5B22',
+    },
+};
 
 export function Chart(props: ChartProps) {
-    /**
-     * If props change, return prepared data.
-     * Then pass to our BaseChart
-     */
-    const preparedData = useMemo(() => {
-        const points = props.data.map(point => ({ value: point * 100 }))
-
-        return [...points, ...Array.from({ length: props.maxDataPoints - points.length }).map((item) => ({ value: undefined }))]
-    }, [props.data, props.maxDataPoints]
+    const color = useMemo(
+        () => COLOR_MAP[props.selectedView],
+        [props.selectedView]
     );
+    const preparedData = useMemo(() => {
+        const points = props.data.map((point) => ({ value: point * 100 }));
+        return [
+            ...points,
+            ...Array.from({ length: props.maxDataPoints - points.length }).map(
+                () => ({ value: undefined })
+            ),
+        ];
+    }, [props.data, props.maxDataPoints]);
 
-    return <BaseChart data={preparedData} fill="#ef4444" stroke="#3b82f6" />
+    return (
+        <BaseChart data={preparedData} fill={color.fill} stroke={color.stroke} />
+    );
 }

@@ -37,6 +37,10 @@ function getCpuUsage(): Promise<number> {
 }
 
 function getMemoryUsage() {
+    // Ram usage hovers around 98-99% because of the way osUtils.freememPercentage() works
+    // It only returns truly free memory not used by the system but macos aggressively caches 
+    // files in ram for performance that are freed instantly when apps need it.
+
     return 1 - osUtils.freememPercentage();
 }
 

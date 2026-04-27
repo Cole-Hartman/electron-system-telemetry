@@ -4,6 +4,7 @@ import { app, BrowserWindow, Menu } from 'electron';
 
 /**
  * UNIT TESTS FOR THE TRAY
+ * When we can't or don't want to test something with E2E tests.
  */
 
 // Mock imports for createTray from electron
