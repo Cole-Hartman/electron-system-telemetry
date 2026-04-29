@@ -1,5 +1,6 @@
 {
     "appId": "com.cole.electron-system-telemetry",
+    "productName": "System Telemetry",
     "files": [
         "dist-electron",
         "dist-react"
