@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol } from "electron";
+import { app, BrowserWindow } from "electron";
 import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";

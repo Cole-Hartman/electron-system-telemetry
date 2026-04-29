@@ -1,30 +1,29 @@
 import { app, BrowserWindow } from "electron";
 import { ipcWebContentsSend } from "./util.js";
+import { appendFileSync } from "fs";
 import path from "path";
 
 const PROTOCOL = 'telemetry-app'
+
+function log(msg: string) {
+    const logPath = path.join(app.getPath('userData'), 'deep-link.log');
+    const line = `${new Date().toISOString()}: ${msg}\n`;
+    appendFileSync(logPath, line);
+    console.log(msg);
+}
 let pendingDeepLink: string | null = null;
 let mainWindow: BrowserWindow | null = null;
 
 // Registering a custom protocol for deep linking
 export function registerProtocol() {
     // Registering the protocol
-    if (process.defaultApp) {
-        // running in development
-        if (process.argv.length >= 2) {
-            // we must tell the OS where to find the executable
-            // process.execPath - is the path to the Electron executable
-            // [path.resolve(process.argv[1])] - is the path to the main script
-            app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [path.resolve(process.argv[1])])
-        }
-    } else {
-        // running in production
-        app.setAsDefaultProtocolClient(PROTOCOL)
-    }
+    // Not set up for dev environment, honeslty easier to just package and run the app
+    app.setAsDefaultProtocolClient(PROTOCOL)
 
     // DURING RUNTIME - Handling deep link on MacOS
     app.on('open-url', (event, url) => {
-        event.preventDefault() // prevent the default behavior of the browser (don't want warning logs, attempts to open in browser, etc.)
+        log(`open-url fired, url=${url}, mainWindow=${!!mainWindow}`);
+        event.preventDefault()
         pendingDeepLink = url;
         if (mainWindow) {
             handleDeepLink(pendingDeepLink, mainWindow)
@@ -41,18 +40,22 @@ export function registerProtocol() {
 }
 
 export function setMainWindow(win: BrowserWindow) {
+    log(`setMainWindow called, pendingDeepLink=${pendingDeepLink}`);
     mainWindow = win;
-    // If a pending deep link was made before the main window was set
     if (pendingDeepLink && mainWindow) {
-        handleDeepLink(pendingDeepLink, mainWindow)
+        const url = pendingDeepLink;
         pendingDeepLink = null;
+        // Wait for app to fully load before sending IPC
+        mainWindow.webContents.once('did-finish-load', () => {
+            log(`did-finish-load fired, now handling deep link`);
+            handleDeepLink(url, mainWindow!);
+        });
     }
 }
 
 export function handleDeepLink(pendingDeepLink: string, mainWindow: BrowserWindow) {
     const parsed = new URL(pendingDeepLink)
-    console.log("raw url: ", pendingDeepLink)
-    console.log("parsed.host", parsed.host)
+    log(`handleDeepLink called, url=${pendingDeepLink}, host=${parsed.host}`);
 
     switch (parsed.host) {
         case 'cpu':

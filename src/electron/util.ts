@@ -1,4 +1,4 @@
-import { ipcMain, WebContents, WebFrameMain } from "electron";
+import { ipcMain, type WebContents, type WebFrameMain } from "electron";
 import { getUIPath } from "./pathResolver.js";
 import { pathToFileURL } from "url";
 
