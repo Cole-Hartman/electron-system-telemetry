@@ -1,12 +1,15 @@
-import { app, BrowserWindow, ipcMain, session, Menu, Tray } from "electron";
-import path from "path";
+import { app, BrowserWindow, protocol } from "electron";
 import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
-import { getAssetsPath, getPreloadPath, getUIPath } from "./pathResolver.js";
+import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
+import { registerProtocol, setMainWindow } from "./protocol.js";
+
+registerProtocol();
 
 app.whenReady().then(() => {
+
     ipcMainHandle("getStaticData", () => getStaticData());
     ipcMainOn("sendFrameAction", (action) => {
         switch (action) {
@@ -32,6 +35,8 @@ app.whenReady().then(() => {
         height: 600,
         frame: false, // remove the default window frame, I created my own
     });
+
+    setMainWindow(mainWindow); // pass the main window to the protocol handler
 
     // Either load React or the built React app
     if (isDev()) {
