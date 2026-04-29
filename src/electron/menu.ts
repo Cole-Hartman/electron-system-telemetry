@@ -14,12 +14,19 @@ export function createMenu(mainWindow: BrowserWindow) {
             type: 'submenu',
             submenu: [{
                 label: 'Quit',
-                click: () => app.quit()
+                click: () => app.quit(),
+                accelerator: 'CmdOrCtrl+Q'
+            },
+            {
+                label: 'Close',
+                click: () => mainWindow.close(),
+                accelerator: 'CmdOrCtrl+W'
             },
             {
                 label: 'DevTools',
                 click: () => mainWindow.webContents.openDevTools(),
-                visible: isDev()
+                visible: isDev(),
+                accelerator: 'CmdOrCtrl+Shift+I'
             }]
         },
         {
@@ -27,15 +34,18 @@ export function createMenu(mainWindow: BrowserWindow) {
             type: 'submenu',
             submenu: [{
                 label: 'CPU',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'CPU')
+                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'CPU'),
+                accelerator: 'CmdOrCtrl+1'
             },
             {
                 label: 'RAM',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'RAM')
+                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'RAM'),
+                accelerator: 'CmdOrCtrl+2'
             },
             {
                 label: 'DISK',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'DISK')
+                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'DISK'),
+                accelerator: 'CmdOrCtrl+3'
             }
             ]
         }
