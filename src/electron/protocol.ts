@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from "electron";
+import { ipcWebContentsSend } from "./util.js";
 import path from "path";
 
 const PROTOCOL = 'telemetry-app'
@@ -51,5 +52,17 @@ export function setMainWindow(win: BrowserWindow) {
 export function handleDeepLink(pendingDeepLink: string, mainWindow: BrowserWindow) {
     const parsed = new URL(pendingDeepLink)
     console.log("raw url: ", pendingDeepLink)
-    console.log(parsed.pathname)
+    console.log("parsed.host", parsed.host)
+
+    switch (parsed.host) {
+        case 'cpu':
+            ipcWebContentsSend("changeView", mainWindow.webContents, 'CPU')
+            break;
+        case 'ram':
+            ipcWebContentsSend("changeView", mainWindow.webContents, 'RAM')
+            break;
+        case 'disk':
+            ipcWebContentsSend("changeView", mainWindow.webContents, 'DISK')
+            break;
+    }
 }
