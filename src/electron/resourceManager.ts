@@ -1,21 +1,21 @@
 import osUtils from "os-utils";
 import os from "os";
 import fs from "fs";
-import { BrowserWindow } from "electron";
+import { WebContentsView } from "electron";
 import { ipcWebContentsSend } from "./util.js"
 
 const POLLING_INTERVAL = 500;
 
-// Poll active resource utilization
-export function pollResources(mainWindow: BrowserWindow) {
+// Poll active resource utilization for a WebContentsView
+export function pollResources(view: WebContentsView) {
     setInterval(async () => {
+        if (view.webContents.isDestroyed()) return;
         const cpuUsage = await getCpuUsage();
         const memoryUsage = getMemoryUsage();
         const diskUsage = getDiskUsage();
         // Send statistics event to renderer
-        ipcWebContentsSend("statistics", mainWindow.webContents, { cpuUsage, memoryUsage, diskUsage: diskUsage.usage })
+        ipcWebContentsSend("statistics", view.webContents, { cpuUsage, memoryUsage, diskUsage: diskUsage.usage })
     }, POLLING_INTERVAL);
-
 }
 
 // General system info

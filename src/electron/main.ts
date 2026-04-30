@@ -1,12 +1,12 @@
-import { app, BrowserWindow } from "electron";
+import { app, BaseWindow, WebContentsView } from "electron";
 import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
-import { registerProtocol, setMainWindow } from "./protocol.js";
+// import { registerProtocol, setMainWindow } from "./protocol.js";
 
-registerProtocol();
+// registerProtocol();
 
 app.whenReady().then(() => {
 
@@ -25,30 +25,37 @@ app.whenReady().then(() => {
         }
     })
 
-    const mainWindow = new BrowserWindow({
+    const mainWindow = new BaseWindow({ width: 800, height: 600 })
+    const View = new WebContentsView({
 
         webPreferences: {
             preload: getPreloadPath(),
-            // contextIsolation: true - runs preload script in a secure context from the browser. (Set by default in electron v12+)
         },
-        width: 800,
-        height: 600,
-        frame: false, // remove the default window frame, I created my own
     });
 
-    setMainWindow(mainWindow); // pass the main window to the protocol handler
+    // setMainWindow(mainWindow); // pass the main window to the protocol handler
 
     // Either load React or the built React app
     if (isDev()) {
-        mainWindow.loadURL("http://localhost:5123");
+        View.webContents.loadURL("http://localhost:5123");
     } else {
-        mainWindow.loadFile(getUIPath());
+        View.webContents.loadFile(getUIPath());
     }
+    mainWindow.contentView.addChildView(View);
+
+    // Set view bounds to fill the window
+    const updateBounds = () => {
+        const { width, height } = mainWindow.getContentBounds();
+        View.setBounds({ x: 0, y: 0, width, height });
+    };
+    updateBounds();
+    mainWindow.on('resize', updateBounds);
+
     // Starts polling resources and sending to renderer
-    pollResources(mainWindow);
+    pollResources(View);
 
     createTray(mainWindow);
-    createMenu(mainWindow);
+    createMenu(mainWindow, View);
 
     handleCloseEvents(mainWindow);
 });
@@ -64,7 +71,7 @@ app.whenReady().then(() => {
  * 2. Clicking the close button (app.quit()): 'before-quit' event -> 'close' event -> app quits
  *    - on quit, allow the app to quit
  */
-function handleCloseEvents(mainWindow: BrowserWindow) {
+function handleCloseEvents(mainWindow: BaseWindow) {
     let willClose = false;
 
     mainWindow.on('close', (event) => {

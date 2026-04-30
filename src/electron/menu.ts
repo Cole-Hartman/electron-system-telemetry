@@ -1,5 +1,4 @@
-import { app, Menu } from "electron";
-import { BrowserWindow } from "electron";
+import { app, BaseWindow, Menu, WebContentsView } from "electron";
 import { isDev, ipcWebContentsSend } from "./util.js";
 
 /**
@@ -7,7 +6,7 @@ import { isDev, ipcWebContentsSend } from "./util.js";
  * - Allows use to select the active view
  */
 
-export function createMenu(mainWindow: BrowserWindow) {
+export function createMenu(mainWindow: BaseWindow, view: WebContentsView) {
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
             label: 'App',
@@ -24,7 +23,7 @@ export function createMenu(mainWindow: BrowserWindow) {
             },
             {
                 label: 'DevTools',
-                click: () => mainWindow.webContents.openDevTools(),
+                click: () => view.webContents.openDevTools(),
                 visible: isDev(),
                 accelerator: 'CmdOrCtrl+Shift+I'
             }]
@@ -34,17 +33,17 @@ export function createMenu(mainWindow: BrowserWindow) {
             type: 'submenu',
             submenu: [{
                 label: 'CPU',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'CPU'),
+                click: () => ipcWebContentsSend("changeView", view.webContents, 'CPU'),
                 accelerator: 'CmdOrCtrl+1'
             },
             {
                 label: 'RAM',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'RAM'),
+                click: () => ipcWebContentsSend("changeView", view.webContents, 'RAM'),
                 accelerator: 'CmdOrCtrl+2'
             },
             {
                 label: 'DISK',
-                click: () => ipcWebContentsSend("changeView", mainWindow.webContents, 'DISK'),
+                click: () => ipcWebContentsSend("changeView", view.webContents, 'DISK'),
                 accelerator: 'CmdOrCtrl+3'
             }
             ]
