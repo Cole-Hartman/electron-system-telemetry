@@ -4,6 +4,7 @@ import { pollResources, getStaticData } from "./resourceManager.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
+import { createTab } from "./tabs.js";
 // import { registerProtocol, setMainWindow } from "./protocol.js";
 
 // registerProtocol();
@@ -26,36 +27,13 @@ app.whenReady().then(() => {
     })
 
     const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false })
-    const View = new WebContentsView({
-
-        webPreferences: {
-            preload: getPreloadPath(),
-        },
-    });
-
-    // setMainWindow(mainWindow); // pass the main window to the protocol handler
-
-    // Either load React or the built React app
-    if (isDev()) {
-        View.webContents.loadURL("http://localhost:5123");
-    } else {
-        View.webContents.loadFile(getUIPath());
-    }
-    mainWindow.contentView.addChildView(View); // add the view to the base window
-
-    // Set view bounds to fill the window
-    const updateBounds = () => {
-        const { width, height } = mainWindow.getContentBounds();
-        View.setBounds({ x: 0, y: 0, width, height });
-    };
-    updateBounds();
-    mainWindow.on('resize', updateBounds);
+    const view = createTab(mainWindow);
 
     // Starts polling resources and sending to renderer
-    pollResources(View);
+    pollResources(view);
 
     createTray(mainWindow);
-    createMenu(mainWindow, View);
+    createMenu(mainWindow, view);
 
     handleCloseEvents(mainWindow);
 });
