@@ -25,7 +25,7 @@ app.whenReady().then(() => {
         }
     })
 
-    const mainWindow = new BaseWindow({ width: 800, height: 600 })
+    const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false })
     const View = new WebContentsView({
 
         webPreferences: {
@@ -41,7 +41,7 @@ app.whenReady().then(() => {
     } else {
         View.webContents.loadFile(getUIPath());
     }
-    mainWindow.contentView.addChildView(View);
+    mainWindow.contentView.addChildView(View); // add the view to the base window
 
     // Set view bounds to fill the window
     const updateBounds = () => {
