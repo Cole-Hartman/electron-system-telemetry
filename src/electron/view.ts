@@ -2,42 +2,71 @@ import { BaseWindow, WebContentsView } from "electron";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { isDev } from "./util.js";
 
-// Creating and managing views
-
-const views: WebContentsView[] = [];
+const TABBAR_HEIGHT = 80;
+const contentViews: WebContentsView[] = [];
 
 /**
- * Create a new view and add it to the main BaseWindow
- * Stacks on top of previous views (last added = topmost)
- * Returns the ID of the new view
+ * Create the tabbar view (header + tabs)
+ * Fixed at the top of the window
  */
-export function createView(BaseWindow: BaseWindow): WebContentsView {
+export function createTabBarView(baseWindow: BaseWindow): WebContentsView {
     const view = new WebContentsView({
         webPreferences: {
             preload: getPreloadPath(),
         },
     });
 
-    // setMainWindow(mainWindow); // pass the main window to the protocol handler
-
-    // Either load React or the built React app
     if (isDev()) {
-        view.webContents.loadURL("http://localhost:5123");
+        view.webContents.loadURL("http://localhost:5123/src/ui/tabbar/index.html");
     } else {
-        view.webContents.loadFile(getUIPath());
+        view.webContents.loadFile(getUIPath("tabbar"));
     }
 
-    BaseWindow.contentView.addChildView(view);
-    views.push(view);
+    baseWindow.contentView.addChildView(view);
 
     const updateBounds = () => {
-        const { width, height } = BaseWindow.getContentBounds();
-        view.setBounds({ x: 0, y: 0, width, height });
+        const { width } = baseWindow.getContentBounds();
+        view.setBounds({ x: 0, y: 0, width, height: TABBAR_HEIGHT });
     };
 
     updateBounds();
-    BaseWindow.on('resize', updateBounds);
+    baseWindow.on('resize', updateBounds);
 
-    return view
+    return view;
+}
+
+/**
+ * Create a content view (stats app)
+ * Positioned below the tabbar
+ */
+export function createContentView(baseWindow: BaseWindow): WebContentsView {
+    const view = new WebContentsView({
+        webPreferences: {
+            preload: getPreloadPath(),
+        },
+    });
+
+    if (isDev()) {
+        view.webContents.loadURL("http://localhost:5123/src/ui/content/index.html");
+    } else {
+        view.webContents.loadFile(getUIPath("content"));
+    }
+
+    baseWindow.contentView.addChildView(view);
+    contentViews.push(view);
+
+    const updateBounds = () => {
+        const { width, height } = baseWindow.getContentBounds();
+        view.setBounds({ x: 0, y: TABBAR_HEIGHT, width, height: height - TABBAR_HEIGHT });
+    };
+
+    updateBounds();
+    baseWindow.on('resize', updateBounds);
+
+    return view;
+}
+
+export function getContentViews(): WebContentsView[] {
+    return contentViews;
 }
 

@@ -1,20 +1,28 @@
-import { app, BaseWindow, WebContentsView } from "electron";
-import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
+import { app, BaseWindow } from "electron";
+import { ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 // import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
-import { createView } from "./view.js";
+import { createTabBarView, createContentView } from "./view.js";
 // import { registerProtocol, setMainWindow } from "./protocol.js";
 
 // registerProtocol();
 
 app.whenReady().then(() => {
+    const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false });
 
-    // IPC handlers for the main process
+    // Create tabbar view first (chrome)
+    const tabbarView = createTabBarView(mainWindow);
+
+    // Create initial content view
+    const contentView = createContentView(mainWindow);
+    pollResources(contentView);
+
+    // IPC handlers
     ipcMainHandle("getStaticData", () => getStaticData());
     ipcMainHandle("newTab", () => {
-        const view = createView(mainWindow);
+        const view = createContentView(mainWindow);
         pollResources(view);
         return view.webContents.id;
     });
@@ -30,16 +38,11 @@ app.whenReady().then(() => {
                 mainWindow.maximize();
                 break;
         }
-    })
+    });
 
-    // Main startup sequence
-    const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false })
-    const view = createView(mainWindow);
-    pollResources(view); // starts polling resources and sending to renderer
     createTray(mainWindow);
-    createMenu(mainWindow, view);
+    createMenu(mainWindow, contentView);
     handleCloseEvents(mainWindow);
-
 });
 
 /**

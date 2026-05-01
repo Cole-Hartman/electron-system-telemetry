@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
-import { TabBar } from './tabbar/TabBar';
 
 function App() {
   const staticData = useStaticData();
@@ -41,8 +40,6 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
-      <TabBar />
       <div className="main">
         <div>
           <SelectOption
@@ -96,25 +93,6 @@ function SelectOption(props: {
         <Chart selectedView={props.view} data={props.data} maxDataPoints={10} />
       </div>
     </button>
-  );
-}
-
-function Header() {
-  return (
-    <header>
-      <button
-        id="close"
-        onClick={() => window.electron.sendFrameAction('CLOSE')}
-      />
-      <button
-        id="minimize"
-        onClick={() => window.electron.sendFrameAction('MINIMIZE')}
-      />
-      <button
-        id="maximize"
-        onClick={() => window.electron.sendFrameAction('MAXIMIZE')}
-      />
-    </header>
   );
 }
 
