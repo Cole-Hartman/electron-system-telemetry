@@ -24,6 +24,7 @@ type EventPayloadMapping = {
     getStaticData: StaticData;
     changeView: View;
     sendFrameAction: FrameWindowAction;
+    newTab: void;
 }
 
 /*
@@ -43,6 +44,7 @@ interface Window {
         getStaticData: () => Promise<StaticData>;
         subscribeChangeView: (callback: (view: View) => void) => UnsubscribeFunction;
         sendFrameAction: (payload: FrameWindowAction) => void;
+        newTab: () => void;
     }
 }
 

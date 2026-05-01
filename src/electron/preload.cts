@@ -11,10 +11,17 @@ electron.contextBridge.exposeInMainWorld('electron', {
     getStaticData: () => ipcInvoke("getStaticData"),
     sendFrameAction: (payload) => {
         ipcSend("sendFrameAction", payload)
-    }
+    },
+
+    // TABS
+    newTab: () => ipcInvoke("newTab"), // Returns the ID of the new tab
+    // close: (id: number) => ipcRenderer.invoke('tabs:close', id),
+    // select: (id: number) => ipcRenderer.invoke('tabs:select', id),
+    // getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),
+    // getSelectedTabId: () => ipcRenderer.invoke('tabs:getSelectedTabId'),
+    // reorder: (tabIds: number[]) => ipcRenderer.invoke('tabs:reorder', tabIds),
+
 } satisfies Window['electron']);
-
-
 // satisfies - tells TS to expect this object to match type x. 
 // In this case, this object is untyped. So we link it to our existing Window interface.
 

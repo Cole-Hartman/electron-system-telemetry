@@ -2,15 +2,16 @@ import { BaseWindow, WebContentsView } from "electron";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { isDev } from "./util.js";
 
-// Creating and managing tabs
+// Creating and managing view
 
-const tabs: WebContentsView[] = [];
+const views: WebContentsView[] = [];
 
 /**
  * Create a new view and add it to the BaseWindow
  * Stacks on top of previous views (last added = topmost)
+ * Returns the ID of the new view
  */
-export function createTab(BaseWindow: BaseWindow): WebContentsView {
+export function createView(BaseWindow: BaseWindow): WebContentsView {
     const view = new WebContentsView({
         webPreferences: {
             preload: getPreloadPath(),
@@ -27,7 +28,7 @@ export function createTab(BaseWindow: BaseWindow): WebContentsView {
     }
 
     BaseWindow.contentView.addChildView(view);
-    tabs.push(view);
+    views.push(view);
 
     const updateBounds = () => {
         const { width, height } = BaseWindow.getContentBounds();
@@ -37,13 +38,13 @@ export function createTab(BaseWindow: BaseWindow): WebContentsView {
     updateBounds();
     BaseWindow.on('resize', updateBounds);
 
-    return view;
+    return view
 }
 
-export function getTabs(): WebContentsView[] {
-    return tabs;
+export function getViews(): WebContentsView[] {
+    return views;
 }
 
-export function getActiveTab(): WebContentsView | undefined {
-    return tabs[tabs.length - 1];
+export function getActiveView(): WebContentsView | undefined {
+    return views[views.length - 1];
 }

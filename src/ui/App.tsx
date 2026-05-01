@@ -41,6 +41,7 @@ function App() {
   return (
     <div className="App">
       <Header />
+      <button onClick={() => { console.log("New tab created: ", window.electron.newTab()) }}>Create New Tab</button>
       <div className="main">
         <div>
           <SelectOption

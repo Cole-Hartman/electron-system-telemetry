@@ -1,10 +1,10 @@
 import { app, BaseWindow, WebContentsView } from "electron";
 import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
-import { getPreloadPath, getUIPath } from "./pathResolver.js";
+// import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
-import { createTab } from "./tabs.js";
+import { createView } from "./view.js";
 // import { registerProtocol, setMainWindow } from "./protocol.js";
 
 // registerProtocol();
@@ -12,6 +12,11 @@ import { createTab } from "./tabs.js";
 app.whenReady().then(() => {
 
     ipcMainHandle("getStaticData", () => getStaticData());
+    ipcMainHandle("newTab", () => {
+        const view = createView(mainWindow);
+        pollResources(view);
+        return view.webContents.id;
+    });
     ipcMainOn("sendFrameAction", (action) => {
         switch (action) {
             case 'CLOSE':
@@ -27,7 +32,7 @@ app.whenReady().then(() => {
     })
 
     const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false })
-    const view = createTab(mainWindow);
+    const view = createView(mainWindow);
 
     // Starts polling resources and sending to renderer
     pollResources(view);
