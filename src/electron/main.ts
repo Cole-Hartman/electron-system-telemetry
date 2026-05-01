@@ -11,6 +11,7 @@ import { createView } from "./view.js";
 
 app.whenReady().then(() => {
 
+    // IPC handlers for the main process
     ipcMainHandle("getStaticData", () => getStaticData());
     ipcMainHandle("newTab", () => {
         const view = createView(mainWindow);
@@ -31,16 +32,14 @@ app.whenReady().then(() => {
         }
     })
 
+    // Main startup sequence
     const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false })
     const view = createView(mainWindow);
-
-    // Starts polling resources and sending to renderer
-    pollResources(view);
-
+    pollResources(view); // starts polling resources and sending to renderer
     createTray(mainWindow);
     createMenu(mainWindow, view);
-
     handleCloseEvents(mainWindow);
+
 });
 
 /**

@@ -2,12 +2,12 @@ import { BaseWindow, WebContentsView } from "electron";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { isDev } from "./util.js";
 
-// Creating and managing view
+// Creating and managing views
 
 const views: WebContentsView[] = [];
 
 /**
- * Create a new view and add it to the BaseWindow
+ * Create a new view and add it to the main BaseWindow
  * Stacks on top of previous views (last added = topmost)
  * Returns the ID of the new view
  */
@@ -41,10 +41,3 @@ export function createView(BaseWindow: BaseWindow): WebContentsView {
     return view
 }
 
-export function getViews(): WebContentsView[] {
-    return views;
-}
-
-export function getActiveView(): WebContentsView | undefined {
-    return views[views.length - 1];
-}

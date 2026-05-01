@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
+import { TabBar } from './tabbar/TabBar';
 
 function App() {
   const staticData = useStaticData();
@@ -41,7 +42,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <button onClick={() => { console.log("New tab created: ", window.electron.newTab()) }}>Create New Tab</button>
+      <TabBar />
       <div className="main">
         <div>
           <SelectOption
