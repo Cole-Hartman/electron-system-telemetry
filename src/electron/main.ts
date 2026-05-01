@@ -1,4 +1,4 @@
-import { app, BaseWindow } from "electron";
+import { app, BaseWindow, ipcMain } from "electron";
 import { ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
 // import { getPreloadPath, getUIPath } from "./pathResolver.js";
@@ -25,6 +25,9 @@ app.whenReady().then(() => {
         const view = createContentView(mainWindow);
         pollResources(view);
         return view.webContents.id;
+    });
+    ipcMain.handle("getViewId", (event) => {
+        return event.sender.id;
     });
     ipcMainOn("sendFrameAction", (action) => {
         switch (action) {

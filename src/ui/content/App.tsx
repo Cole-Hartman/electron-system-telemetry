@@ -34,12 +34,18 @@ function App() {
     }
   }, [activeView, cpuUsages, ramUsages, storageUsages]);
 
+  const [viewId, setViewId] = useState<number | null>(null);
+  useEffect(() => {
+    window.electron.getViewId().then(setViewId);
+  }, []);
+
   useEffect(() => {
     return window.electron.subscribeChangeView((view) => setActiveView(view));
   }, []);
 
   return (
     <div className="App">
+      <div className="view-id">View ID: {viewId}</div>
       <div className="main">
         <div>
           <SelectOption

@@ -1,3 +1,10 @@
+.view-id {
+  text-align: center;
+  padding: 0.5rem;
+  color: #888;
+  font-size: 0.875rem;
+}
+
 .main {
   display: grid;
   grid-template-columns: 16rem auto;
@@ -6,7 +13,7 @@
   margin: 1rem;
   max-width: 900px;
   margin: auto;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .mainGrid {
