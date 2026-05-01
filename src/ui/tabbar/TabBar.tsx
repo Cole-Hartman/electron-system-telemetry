@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tab } from './Tab';
+import './Tabs.css';
 
 type TabData = {
     id: number;
@@ -32,6 +33,11 @@ export function TabBar() {
 
     return (
         <div className="tab-bar">
+            <div className="traffic-lights">
+                <button id="close" onClick={() => window.electron.sendFrameAction('CLOSE')} />
+                <button id="minimize" onClick={() => window.electron.sendFrameAction('MINIMIZE')} />
+                <button id="maximize" onClick={() => window.electron.sendFrameAction('MAXIMIZE')} />
+            </div>
             <div className="tab-list">
                 {tabs.map((tab) => (
                     <Tab

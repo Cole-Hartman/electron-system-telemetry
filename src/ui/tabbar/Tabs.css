@@ -1,16 +1,45 @@
 .tab-bar {
     display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    padding: 8px 8px 0;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     background: #1e1e1e;
     border-bottom: 1px solid #3a3a3a;
     -webkit-app-region: drag;
 }
 
+.traffic-lights {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.traffic-lights button {
+    all: unset;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+}
+
+#close {
+    background-color: #ff5f56;
+}
+
+#minimize {
+    background-color: #ffbd2e;
+}
+
+#maximize {
+    background-color: #27c93f;
+}
+
 .tab-list {
     display: flex;
+    align-items: flex-end;
     gap: 2px;
+    flex: 1;
     -webkit-app-region: no-drag;
 }
 
@@ -18,9 +47,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    margin-bottom: 4px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border: none;
     border-radius: 6px;

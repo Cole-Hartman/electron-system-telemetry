@@ -1,8 +1,9 @@
 import { BaseWindow, WebContentsView } from "electron";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { isDev } from "./util.js";
+import { createMenu } from "./menu.js";
 
-const TABBAR_HEIGHT = 80;
+const TABBAR_HEIGHT = 44;
 const contentViews: WebContentsView[] = [];
 
 /**
@@ -54,6 +55,8 @@ export function createContentView(baseWindow: BaseWindow): WebContentsView {
 
     baseWindow.contentView.addChildView(view);
     contentViews.push(view);
+
+    createMenu(baseWindow, view); // make sure we create the application menu for each content view
 
     const updateBounds = () => {
         const { width, height } = baseWindow.getContentBounds();
