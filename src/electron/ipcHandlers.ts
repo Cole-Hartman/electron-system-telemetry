@@ -1,7 +1,7 @@
 import { ipcMainHandle, ipcMainOn } from "./util.js";
 import { getStaticData } from "./resourceManager.js";
 import { BaseWindow, ipcMain } from "electron";
-import { createContentView, switchToView } from "./view.js";
+import { createContentView, switchToView, getFirstTabId } from "./view.js";
 import { pollResources } from "./resourceManager.js";
 
 /**
@@ -37,5 +37,9 @@ export function ipcHandlers(mainWindow: BaseWindow) {
 
     ipcMainOn("switchTab", (viewId) => {
         switchToView(viewId, mainWindow);
+    });
+
+    ipcMainHandle("getFirstTabId", () => {
+        return getFirstTabId();
     });
 }

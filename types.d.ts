@@ -27,6 +27,7 @@ type EventPayloadMapping = {
     newTab: number;
     switchTab: number;
     getViewId: number;
+    getFirstTabId: number;
 }
 
 /*
@@ -49,6 +50,7 @@ interface Window {
         newTab: () => Promise<number>;
         getViewId: () => Promise<number>;
         switchTab: (id: number) => void;
+        getFirstTabId: () => Promise<number>;
     }
 }
 

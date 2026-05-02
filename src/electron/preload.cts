@@ -17,6 +17,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
     newTab: () => ipcInvoke("newTab"),
     switchTab: (id: number) => ipcSend("switchTab", id),
     getViewId: () => ipcInvoke("getViewId"),
+    getFirstTabId: () => ipcInvoke("getFirstTabId"),
     // close: (id: number) => ipcRenderer.invoke('tabs:close', id),
     // select: (id: number) => ipcRenderer.invoke('tabs:select', id),
     // getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),

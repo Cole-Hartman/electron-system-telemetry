@@ -73,6 +73,10 @@ export function getContentViews(): WebContentsView[] {
     return contentViews;
 }
 
+export function getFirstTabId(): number {
+    return contentViews[0]?.webContents.id ?? 0;
+}
+
 export function switchToView(viewId: number, baseWindow: BaseWindow) {
     for (const view of contentViews) {
         if (view.webContents.id === viewId) {

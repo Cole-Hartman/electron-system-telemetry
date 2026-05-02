@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tab } from './Tab';
 import './Tabs.css';
 
@@ -8,8 +8,15 @@ type TabData = {
 };
 
 export function TabBar() {
-    const [tabs, setTabs] = useState<TabData[]>([{ id: 1, label: 'Tab 1' }]);
-    const [activeTabId, setActiveTabId] = useState(1);
+    const [tabs, setTabs] = useState<TabData[]>([]);
+    const [activeTabId, setActiveTabId] = useState<number | null>(null);
+
+    useEffect(() => {
+        window.electron.getFirstTabId().then((id) => {
+            setTabs([{ id, label: 'Tab 1' }]);
+            setActiveTabId(id);
+        });
+    }, []);
 
     const handleNewTab = async () => {
         const id = await window.electron.newTab();
