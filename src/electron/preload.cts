@@ -15,6 +15,7 @@ electron.contextBridge.exposeInMainWorld('electron', {
 
     // TABS
     newTab: () => ipcInvoke("newTab"),
+    switchTab: (id: number) => ipcSend("switchTab", id),
     getViewId: () => ipcInvoke("getViewId"),
     // close: (id: number) => ipcRenderer.invoke('tabs:close', id),
     // select: (id: number) => ipcRenderer.invoke('tabs:select', id),
@@ -33,12 +34,14 @@ electron.contextBridge.exposeInMainWorld('electron', {
 * Mirror pattern implemented for the backend in ./utils.ts
 */
 
+// Sends a message to main, listens for a response, returns a promise.
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
     key: Key,
 ): Promise<EventPayloadMapping[Key]> {
     return electron.ipcRenderer.invoke(key);
 }
 
+// Listens for messages on a channel. When a message arrives, the callback fires.
 function ipcOn<Key extends keyof EventPayloadMapping>(
     key: Key,
     callback: (payload: EventPayloadMapping[Key]) => void) {
@@ -50,6 +53,7 @@ function ipcOn<Key extends keyof EventPayloadMapping>(
     return () => electron.ipcRenderer.off(key, cb);
 }
 
+// Sends a message to main.
 function ipcSend<Key extends keyof EventPayloadMapping>(
     key: Key, payload: EventPayloadMapping[Key]) {
     electron.ipcRenderer.send(key, payload);

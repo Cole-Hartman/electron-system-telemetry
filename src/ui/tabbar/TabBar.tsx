@@ -29,6 +29,7 @@ export function TabBar() {
 
     const handleSelectTab = (id: number) => {
         setActiveTabId(id);
+        window.electron.switchTab(id);
     };
 
     return (

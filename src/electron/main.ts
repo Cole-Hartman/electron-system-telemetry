@@ -6,6 +6,7 @@ import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
 import { createTabBarView, createContentView } from "./view.js";
 // import { registerProtocol, setMainWindow } from "./protocol.js";
+import { ipcHandlers } from "./ipcHandlers.js";
 
 // registerProtocol();
 
@@ -19,29 +20,7 @@ app.whenReady().then(() => {
     const contentView = createContentView(mainWindow);
     pollResources(contentView);
 
-    // IPC handlers
-    ipcMainHandle("getStaticData", () => getStaticData());
-    ipcMainHandle("newTab", () => {
-        const view = createContentView(mainWindow);
-        pollResources(view);
-        return view.webContents.id;
-    });
-    ipcMain.handle("getViewId", (event) => {
-        return event.sender.id;
-    });
-    ipcMainOn("sendFrameAction", (action) => {
-        switch (action) {
-            case 'CLOSE':
-                mainWindow.close();
-                break;
-            case 'MINIMIZE':
-                mainWindow.minimize();
-                break;
-            case 'MAXIMIZE':
-                mainWindow.maximize();
-                break;
-        }
-    });
+    ipcHandlers(mainWindow);
 
     createTray(mainWindow);
     createMenu(mainWindow, contentView);

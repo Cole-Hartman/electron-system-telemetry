@@ -73,3 +73,14 @@ export function getContentViews(): WebContentsView[] {
     return contentViews;
 }
 
+export function switchToView(viewId: number, baseWindow: BaseWindow) {
+    for (const view of contentViews) {
+        if (view.webContents.id === viewId) {
+            view.setVisible(true);
+            createMenu(baseWindow, view);
+        } else {
+            view.setVisible(false);
+        }
+    }
+}
+
