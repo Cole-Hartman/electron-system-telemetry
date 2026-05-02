@@ -37,9 +37,8 @@
 
 .tab-list {
     display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    flex: 1;
+    align-items: center;
+    gap: 4px;
     -webkit-app-region: no-drag;
 }
 

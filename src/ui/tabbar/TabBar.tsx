@@ -49,10 +49,10 @@ export function TabBar() {
                         onClose={handleCloseTab}
                     />
                 ))}
+                <button className="tab-new" onClick={handleNewTab}>
+                    +
+                </button>
             </div>
-            <button className="tab-new" onClick={handleNewTab}>
-                +
-            </button>
         </div>
     );
 }
