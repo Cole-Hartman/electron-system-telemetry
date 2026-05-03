@@ -42,15 +42,16 @@ export function validateEventFrame(frame: WebFrameMain | null) {
     if (!frame) {
         throw new Error("No frame found");
     }
-    // If we are in developent, check that the current frames url matches our development server url
-    if (isDev() && new URL(frame.url).host == "localhost:5123") {
-        // the request is coming from our development server, it's safe
+    // If we are in development, check that the current frames url matches our development server url
+    if (isDev() && new URL(frame.url).host === "localhost:5123") {
         return;
     }
-    // If we are not in development, check that the current frames url matches our built app url
-    // This path validation methods can become more complex in the future as you add more Renderer processes.
-    // Validating in general is complicated, but for now this works.
-    if (frame.url !== pathToFileURL(getUIPath()).toString()) {
+    // If we are not in development, check that the current frames url matches one of our built app urls
+    const validUrls = [
+        pathToFileURL(getUIPath("content")).toString(),
+        pathToFileURL(getUIPath("tabbar")).toString(),
+    ];
+    if (!validUrls.includes(frame.url)) {
         throw new Error("Malicious event detected");
     }
 }

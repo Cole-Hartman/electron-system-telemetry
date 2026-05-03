@@ -8,7 +8,7 @@ import { pollResources } from "./resourceManager.js";
 * Electron IPC Handlers
 */
 
-export function ipcHandlers(mainWindow: BaseWindow) {
+export function initIpcHandlers(mainWindow: BaseWindow) {
 
     ipcMainHandle("getStaticData", () => getStaticData());
     ipcMain.handle("getViewId", (event) => {

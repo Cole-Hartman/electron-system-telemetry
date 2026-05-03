@@ -11,7 +11,7 @@ export function getPreloadPath() {
 }
 
 export function getUIPath(route: "content" | "tabbar" = "content") {
-    return path.join(app.getAppPath(), `/dist-react/${route}/index.html`);
+    return path.join(app.getAppPath(), `/dist-react/src/ui/${route}/index.html`);
 }
 
 export function getAssetsPath() {
