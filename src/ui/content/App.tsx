@@ -34,13 +34,18 @@ function App() {
     }
   }, [activeView, cpuUsages, ramUsages, storageUsages]);
 
+  const [viewId, setViewId] = useState<number | null>(null);
+  useEffect(() => {
+    window.electron.getViewId().then(setViewId);
+  }, []);
+
   useEffect(() => {
     return window.electron.subscribeChangeView((view) => setActiveView(view));
   }, []);
 
   return (
     <div className="App">
-      <Header />
+      <div className="view-id">View ID: {viewId}</div>
       <div className="main">
         <div>
           <SelectOption
@@ -94,25 +99,6 @@ function SelectOption(props: {
         <Chart selectedView={props.view} data={props.data} maxDataPoints={10} />
       </div>
     </button>
-  );
-}
-
-function Header() {
-  return (
-    <header>
-      <button
-        id="close"
-        onClick={() => window.electron.sendFrameAction('CLOSE')}
-      />
-      <button
-        id="minimize"
-        onClick={() => window.electron.sendFrameAction('MINIMIZE')}
-      />
-      <button
-        id="maximize"
-        onClick={() => window.electron.sendFrameAction('MAXIMIZE')}
-      />
-    </header>
   );
 }
 

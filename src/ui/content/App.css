@@ -1,33 +1,8 @@
-/* Complete CSS file from tutorial */
-
-header {
-  width: 100%;
-  text-align: left;
+.view-id {
+  text-align: center;
   padding: 0.5rem;
-  box-sizing: border-box;
-  background-color: #181818;
-  -webkit-app-region: drag;
-}
-
-header button {
-  all: unset;
-  border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
-  margin: 0.25rem;
-  -webkit-app-region: no-drag;
-}
-
-#close {
-  background-color: red;
-}
-
-#minimize {
-  background-color: yellow;
-}
-
-#maximize {
-  background-color: lime;
+  color: #888;
+  font-size: 0.875rem;
 }
 
 .main {
@@ -38,7 +13,7 @@ header button {
   margin: 1rem;
   max-width: 900px;
   margin: auto;
-  margin-top: 4rem;
+  margin-top: 1rem;
 }
 
 .mainGrid {

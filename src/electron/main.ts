@@ -1,55 +1,29 @@
-import { app, BrowserWindow } from "electron";
-import { isDev, ipcMainHandle, ipcMainOn } from "./util.js";
+import { app, BaseWindow, ipcMain } from "electron";
+import { ipcMainHandle, ipcMainOn } from "./util.js";
 import { pollResources, getStaticData } from "./resourceManager.js";
-import { getPreloadPath, getUIPath } from "./pathResolver.js";
+// import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
-import { registerProtocol, setMainWindow } from "./protocol.js";
+import { createTabBarView, createContentView } from "./view.js";
+// import { registerProtocol, setMainWindow } from "./protocol.js";
+import { ipcHandlers } from "./ipcHandlers.js";
 
-registerProtocol();
+// registerProtocol();
 
 app.whenReady().then(() => {
+    const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false });
 
-    ipcMainHandle("getStaticData", () => getStaticData());
-    ipcMainOn("sendFrameAction", (action) => {
-        switch (action) {
-            case 'CLOSE':
-                mainWindow.close();
-                break;
-            case 'MINIMIZE':
-                mainWindow.minimize();
-                break;
-            case 'MAXIMIZE':
-                mainWindow.maximize();
-                break;
-        }
-    })
+    // Create tabbar view first (chrome)
+    const tabbarView = createTabBarView(mainWindow);
 
-    const mainWindow = new BrowserWindow({
+    // Create initial content view
+    const contentView = createContentView(mainWindow);
+    pollResources(contentView);
 
-        webPreferences: {
-            preload: getPreloadPath(),
-            // contextIsolation: true - runs preload script in a secure context from the browser. (Set by default in electron v12+)
-        },
-        width: 800,
-        height: 600,
-        frame: false, // remove the default window frame, I created my own
-    });
-
-    setMainWindow(mainWindow); // pass the main window to the protocol handler
-
-    // Either load React or the built React app
-    if (isDev()) {
-        mainWindow.loadURL("http://localhost:5123");
-    } else {
-        mainWindow.loadFile(getUIPath());
-    }
-    // Starts polling resources and sending to renderer
-    pollResources(mainWindow);
+    ipcHandlers(mainWindow);
 
     createTray(mainWindow);
-    createMenu(mainWindow);
-
+    createMenu(mainWindow, contentView);
     handleCloseEvents(mainWindow);
 });
 
@@ -64,7 +38,7 @@ app.whenReady().then(() => {
  * 2. Clicking the close button (app.quit()): 'before-quit' event -> 'close' event -> app quits
  *    - on quit, allow the app to quit
  */
-function handleCloseEvents(mainWindow: BrowserWindow) {
+function handleCloseEvents(mainWindow: BaseWindow) {
     let willClose = false;
 
     mainWindow.on('close', (event) => {

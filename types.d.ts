@@ -24,6 +24,11 @@ type EventPayloadMapping = {
     getStaticData: StaticData;
     changeView: View;
     sendFrameAction: FrameWindowAction;
+    newTab: number;
+    switchTab: number;
+    getViewId: number;
+    getFirstTabId: number;
+    closeTab: { id: number, tabToSwitchTo: number };
 }
 
 /*
@@ -43,6 +48,11 @@ interface Window {
         getStaticData: () => Promise<StaticData>;
         subscribeChangeView: (callback: (view: View) => void) => UnsubscribeFunction;
         sendFrameAction: (payload: FrameWindowAction) => void;
+        newTab: () => Promise<number>;
+        switchTab: (id: number) => void;
+        closeTab: (id: number, tabToSwitchTo: number) => void;
+        getViewId: () => Promise<number>;
+        getFirstTabId: () => Promise<number>;
     }
 }
 

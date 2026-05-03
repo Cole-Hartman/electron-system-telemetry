@@ -11,7 +11,20 @@ electron.contextBridge.exposeInMainWorld('electron', {
     getStaticData: () => ipcInvoke("getStaticData"),
     sendFrameAction: (payload) => {
         ipcSend("sendFrameAction", payload)
-    }
+    },
+
+    // TABS
+    newTab: () => ipcInvoke("newTab"),
+    switchTab: (id: number) => ipcSend("switchTab", id),
+    closeTab: (id: number, tabToSwitchTo: number) => ipcSend("closeTab", { id, tabToSwitchTo }),
+    getViewId: () => ipcInvoke("getViewId"),
+    getFirstTabId: () => ipcInvoke("getFirstTabId"),
+    // close: (id: number) => ipcRenderer.invoke('tabs:close', id),
+    // select: (id: number) => ipcRenderer.invoke('tabs:select', id),
+    // getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),
+    // getSelectedTabId: () => ipcRenderer.invoke('tabs:getSelectedTabId'),
+    // reorder: (tabIds: number[]) => ipcRenderer.invoke('tabs:reorder', tabIds),
+
 } satisfies Window['electron']);
 // satisfies - tells TS to expect this object to match type x. 
 // In this case, this object is untyped. So we link it to our existing Window interface.
@@ -23,12 +36,14 @@ electron.contextBridge.exposeInMainWorld('electron', {
 * Mirror pattern implemented for the backend in ./utils.ts
 */
 
+// Sends a message to main, listens for a response, returns a promise.
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
     key: Key,
 ): Promise<EventPayloadMapping[Key]> {
     return electron.ipcRenderer.invoke(key);
 }
 
+// Listens for messages on a channel. When a message arrives, the callback fires.
 function ipcOn<Key extends keyof EventPayloadMapping>(
     key: Key,
     callback: (payload: EventPayloadMapping[Key]) => void) {
@@ -40,6 +55,7 @@ function ipcOn<Key extends keyof EventPayloadMapping>(
     return () => electron.ipcRenderer.off(key, cb);
 }
 
+// Sends a message to main.
 function ipcSend<Key extends keyof EventPayloadMapping>(
     key: Key, payload: EventPayloadMapping[Key]) {
     electron.ipcRenderer.send(key, payload);
