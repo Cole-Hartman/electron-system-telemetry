@@ -4,6 +4,8 @@ The main node process polls CPU, memory, and disk usage and sends updates to the
 
 The UI can also request static machine info (CPU model, totals) via a handled channel.
 
+[Project Tracker](https://github.com/Cole-Hartman/electron-system-telemetry/issues/2)
+
 ## Electron topics I’m learning
 
 - creating a build system with good dx
