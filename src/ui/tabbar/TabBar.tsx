@@ -26,11 +26,23 @@ export function TabBar() {
     };
 
     const handleCloseTab = (id: number) => {
-        if (tabs.length === 1) return;
+        const index = tabs.findIndex((tab) => tab.id === id);
+        
+        let tabToSwitchTo: number;
+        if (tabs.length === 1) {
+            tabToSwitchTo = id;
+        } else if (index > 0) {
+            tabToSwitchTo = tabs[index - 1].id;
+        } else {
+            tabToSwitchTo = tabs[index + 1].id;
+        }
+
+        window.electron.closeTab(id, tabToSwitchTo);
+
         const newTabs = tabs.filter((tab) => tab.id !== id);
         setTabs(newTabs);
-        if (activeTabId === id) {
-            setActiveTabId(newTabs[newTabs.length - 1].id);
+        if (activeTabId === id && newTabs.length > 0) {
+            setActiveTabId(tabToSwitchTo);
         }
     };
 

@@ -28,6 +28,7 @@ type EventPayloadMapping = {
     switchTab: number;
     getViewId: number;
     getFirstTabId: number;
+    closeTab: { id: number, tabToSwitchTo: number };
 }
 
 /*
@@ -48,8 +49,9 @@ interface Window {
         subscribeChangeView: (callback: (view: View) => void) => UnsubscribeFunction;
         sendFrameAction: (payload: FrameWindowAction) => void;
         newTab: () => Promise<number>;
-        getViewId: () => Promise<number>;
         switchTab: (id: number) => void;
+        closeTab: (id: number, tabToSwitchTo: number) => void;
+        getViewId: () => Promise<number>;
         getFirstTabId: () => Promise<number>;
     }
 }

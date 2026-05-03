@@ -88,3 +88,18 @@ export function switchToView(viewId: number, baseWindow: BaseWindow) {
     }
 }
 
+export function closeTab(id: number, tabToSwitchTo: number, baseWindow: BaseWindow) {
+    const index = contentViews.findIndex((view) => view.webContents.id === id);
+    if (index === -1) return;
+
+    const viewToClose = contentViews[index];
+    contentViews.splice(index, 1);
+    baseWindow.contentView.removeChildView(viewToClose);
+
+    if (contentViews.length === 0) {
+        baseWindow.close();
+    } else {
+        switchToView(tabToSwitchTo, baseWindow);
+    }
+}
+
