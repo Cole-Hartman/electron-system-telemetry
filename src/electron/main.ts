@@ -1,20 +1,18 @@
-import { app, BaseWindow, ipcMain } from "electron";
-import { ipcMainHandle, ipcMainOn } from "./util.js";
-import { pollResources, getStaticData } from "./resourceManager.js";
-// import { getPreloadPath, getUIPath } from "./pathResolver.js";
+import { app, BaseWindow } from "electron";
+import { pollResources, } from "./resourceManager.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
 import { createTabBarView, createContentView } from "./view.js";
-// import { registerProtocol, setMainWindow } from "./protocol.js";
+import { registerProtocol } from "./protocol.js";
 import { ipcHandlers } from "./ipcHandlers.js";
 
-// registerProtocol();
+registerProtocol();
 
 app.whenReady().then(() => {
     const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false });
 
     // Create tabbar view first (chrome)
-    const tabbarView = createTabBarView(mainWindow);
+    createTabBarView(mainWindow);
 
     // Create initial content view
     const contentView = createContentView(mainWindow);
