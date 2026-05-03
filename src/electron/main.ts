@@ -3,8 +3,8 @@ import { pollResources, } from "./resourceManager.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
 import { createTabBarView, createContentView } from "./view.js";
-import { registerProtocol } from "./protocol.js";
-import { ipcHandlers } from "./ipcHandlers.js";
+import { registerProtocol, setMainWindowForDeepLink } from "./protocol.js";
+import { initIpcHandlers } from "./ipcHandlers.js";
 
 registerProtocol();
 
@@ -13,12 +13,12 @@ app.whenReady().then(() => {
 
     // Create tabbar view first (chrome)
     createTabBarView(mainWindow);
-
     // Create initial content view
     const contentView = createContentView(mainWindow);
     pollResources(contentView);
 
-    ipcHandlers(mainWindow);
+    initIpcHandlers(mainWindow);
+    setMainWindowForDeepLink(mainWindow);
 
     createTray(mainWindow);
     createMenu(mainWindow, contentView);

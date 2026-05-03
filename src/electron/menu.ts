@@ -1,5 +1,5 @@
 import { app, BaseWindow, Menu, WebContentsView } from "electron";
-import { isDev, ipcWebContentsSend } from "./util.js";
+import { ipcWebContentsSend } from "./util.js";
 
 /**
  * Creates the application menu for the main window.
@@ -24,8 +24,7 @@ export function createMenu(mainWindow: BaseWindow, view: WebContentsView) {
             {
                 label: 'DevTools',
                 click: () => view.webContents.openDevTools(),
-                visible: isDev(),
-                accelerator: 'CmdOrCtrl+Shift+I'
+                accelerator: 'CmdOrCtrl+Option+I'
             }]
         },
         {
