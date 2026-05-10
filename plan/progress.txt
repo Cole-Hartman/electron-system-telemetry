@@ -1,0 +1,7 @@
+# Implementation Progress Log
+
+## Learnings
+
+(Reusable patterns and discoveries made during implementation.)
+
+---

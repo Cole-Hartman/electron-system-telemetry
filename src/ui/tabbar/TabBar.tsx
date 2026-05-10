@@ -10,6 +10,8 @@ type TabData = {
 export function TabBar() {
     const [tabs, setTabs] = useState<TabData[]>([]);
     const [activeTabId, setActiveTabId] = useState<number | null>(null);
+    const [draggedTabId, setDraggedTabId] = useState<number | null>(null);
+    const [dragOverTabId, setDragOverTabId] = useState<number | null>(null);
 
     useEffect(() => {
         window.electron.getFirstTabId().then((id) => {
@@ -51,6 +53,45 @@ export function TabBar() {
         window.electron.switchTab(id);
     };
 
+    const handleDragStart = (e: React.DragEvent, id: number) => {
+        setDraggedTabId(id);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e: React.DragEvent, id: number) => {
+        e.preventDefault();
+        if (id !== draggedTabId) {
+            setDragOverTabId(id);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent, targetId: number) => {
+        e.preventDefault();
+        if (draggedTabId === null || draggedTabId === targetId) return;
+
+        const draggedIndex = tabs.findIndex(t => t.id === draggedTabId);
+        const targetIndex = tabs.findIndex(t => t.id === targetId);
+
+        const newTabs = [...tabs];
+        const [draggedTab] = newTabs.splice(draggedIndex, 1);
+        newTabs.splice(targetIndex, 0, draggedTab);
+
+        setTabs(newTabs);
+        setDragOverTabId(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedTabId(null);
+        setDragOverTabId(null);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        // Only clear if leaving the tab-list entirely (not entering a child)
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDragOverTabId(null);
+        }
+    };
+
     return (
         <div className="tab-bar">
             <div className="traffic-lights">
@@ -58,15 +99,21 @@ export function TabBar() {
                 <button id="minimize" onClick={() => window.electron.sendFrameAction('MINIMIZE')} />
                 <button id="maximize" onClick={() => window.electron.sendFrameAction('MAXIMIZE')} />
             </div>
-            <div className="tab-list">
+            <div className="tab-list" onDragLeave={handleDragLeave}>
                 {tabs.map((tab) => (
                     <Tab
                         key={tab.id}
                         id={tab.id}
                         label={tab.label}
                         isActive={tab.id === activeTabId}
+                        isDragging={tab.id === draggedTabId}
+                        isDropTarget={tab.id === dragOverTabId}
                         onSelect={handleSelectTab}
                         onClose={handleCloseTab}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        onDragEnd={handleDragEnd}
                     />
                 ))}
                 <button className="tab-new" onClick={handleNewTab}>
