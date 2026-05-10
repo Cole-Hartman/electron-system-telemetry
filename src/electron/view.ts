@@ -1,6 +1,6 @@
 import { BaseWindow, WebContentsView } from "electron";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
-import { isDev } from "./util.js";
+import { isDev, DEV_SERVER_URL } from "./util.js";
 import { createMenu } from "./menu.js";
 
 export const TABBAR_HEIGHT = 44;
@@ -18,7 +18,7 @@ export function createTabBarView(baseWindow: BaseWindow): WebContentsView {
     });
 
     if (isDev()) {
-        view.webContents.loadURL("http://localhost:5123/src/ui/tabbar/index.html");
+        view.webContents.loadURL(`${DEV_SERVER_URL}/src/ui/tabbar/index.html`);
     } else {
         view.webContents.loadFile(getUIPath("tabbar"));
     }
@@ -44,7 +44,7 @@ export function createContentView(baseWindow: BaseWindow): WebContentsView {
     });
 
     if (isDev()) {
-        view.webContents.loadURL("http://localhost:5123/src/ui/content/index.html");
+        view.webContents.loadURL(`${DEV_SERVER_URL}/src/ui/content/index.html`);
     } else {
         view.webContents.loadFile(getUIPath("content"));
     }

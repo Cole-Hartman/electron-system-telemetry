@@ -2,6 +2,8 @@ import { ipcMain, type WebContents, type WebFrameMain } from "electron";
 import { getUIPath } from "./pathResolver.js";
 import { pathToFileURL } from "url";
 
+export const DEV_SERVER_URL = "http://localhost:5123";
+
 export function isDev(): boolean {
     return process.env.NODE_ENV === "development";
 }
@@ -43,7 +45,7 @@ export function validateEventFrame(frame: WebFrameMain | null) {
         throw new Error("No frame found");
     }
     // If we are in development, check that the current frames url matches our development server url
-    if (isDev() && new URL(frame.url).host === "localhost:5123") {
+    if (isDev() && new URL(frame.url).host === new URL(DEV_SERVER_URL).host) {
         return;
     }
     // If we are not in development, check that the current frames url matches one of our built app urls
