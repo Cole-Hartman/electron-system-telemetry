@@ -121,3 +121,11 @@
     background: #ff5555;
     color: #fff;
 }
+
+.tab-dragging {
+    opacity: 0.5;
+}
+
+.tab-drop-target {
+    border-left: 2px solid #007aff;
+}

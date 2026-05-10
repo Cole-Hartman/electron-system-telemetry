@@ -11,6 +11,7 @@ export function TabBar() {
     const [tabs, setTabs] = useState<TabData[]>([]);
     const [activeTabId, setActiveTabId] = useState<number | null>(null);
     const [draggedTabId, setDraggedTabId] = useState<number | null>(null);
+    const [dragOverTabId, setDragOverTabId] = useState<number | null>(null);
 
     useEffect(() => {
         window.electron.getFirstTabId().then((id) => {
@@ -57,8 +58,11 @@ export function TabBar() {
         e.dataTransfer.effectAllowed = 'move';
     };
 
-    const handleDragOver = (e: React.DragEvent, _id: number) => {
+    const handleDragOver = (e: React.DragEvent, id: number) => {
         e.preventDefault();
+        if (id !== draggedTabId) {
+            setDragOverTabId(id);
+        }
     };
 
     const handleDrop = (e: React.DragEvent, targetId: number) => {
@@ -73,10 +77,12 @@ export function TabBar() {
         newTabs.splice(targetIndex, 0, draggedTab);
 
         setTabs(newTabs);
+        setDragOverTabId(null);
     };
 
     const handleDragEnd = () => {
         setDraggedTabId(null);
+        setDragOverTabId(null);
     };
 
     return (
@@ -93,6 +99,8 @@ export function TabBar() {
                         id={tab.id}
                         label={tab.label}
                         isActive={tab.id === activeTabId}
+                        isDragging={tab.id === draggedTabId}
+                        isDropTarget={tab.id === dragOverTabId}
                         onSelect={handleSelectTab}
                         onClose={handleCloseTab}
                         onDragStart={handleDragStart}

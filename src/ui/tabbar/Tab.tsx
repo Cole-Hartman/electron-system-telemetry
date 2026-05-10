@@ -4,6 +4,8 @@ type TabProps = {
     id: number;
     label: string;
     isActive: boolean;
+    isDragging: boolean;
+    isDropTarget: boolean;
     onSelect: (id: number) => void;
     onClose: (id: number) => void;
     onDragStart: (e: React.DragEvent, id: number) => void;
@@ -12,10 +14,15 @@ type TabProps = {
     onDragEnd: () => void;
 };
 
-export function Tab({ id, label, isActive, onSelect, onClose, onDragStart, onDragOver, onDrop, onDragEnd }: TabProps) {
+export function Tab({ id, label, isActive, isDragging, isDropTarget, onSelect, onClose, onDragStart, onDragOver, onDrop, onDragEnd }: TabProps) {
+    const classNames = ['tab'];
+    if (isActive) classNames.push('tab-active');
+    if (isDragging) classNames.push('tab-dragging');
+    if (isDropTarget) classNames.push('tab-drop-target');
+
     return (
         <div
-            className={`tab ${isActive ? 'tab-active' : ''}`}
+            className={classNames.join(' ')}
             onClick={() => onSelect(id)}
             draggable
             onDragStart={(e) => onDragStart(e, id)}
