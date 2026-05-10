@@ -85,6 +85,13 @@ export function TabBar() {
         setDragOverTabId(null);
     };
 
+    const handleDragLeave = (e: React.DragEvent) => {
+        // Only clear if leaving the tab-list entirely (not entering a child)
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDragOverTabId(null);
+        }
+    };
+
     return (
         <div className="tab-bar">
             <div className="traffic-lights">
@@ -92,7 +99,7 @@ export function TabBar() {
                 <button id="minimize" onClick={() => window.electron.sendFrameAction('MINIMIZE')} />
                 <button id="maximize" onClick={() => window.electron.sendFrameAction('MAXIMIZE')} />
             </div>
-            <div className="tab-list">
+            <div className="tab-list" onDragLeave={handleDragLeave}>
                 {tabs.map((tab) => (
                     <Tab
                         key={tab.id}
