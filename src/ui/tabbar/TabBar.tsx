@@ -10,6 +10,7 @@ type TabData = {
 export function TabBar() {
     const [tabs, setTabs] = useState<TabData[]>([]);
     const [activeTabId, setActiveTabId] = useState<number | null>(null);
+    const [draggedTabId, setDraggedTabId] = useState<number | null>(null);
 
     useEffect(() => {
         window.electron.getFirstTabId().then((id) => {
@@ -51,6 +52,33 @@ export function TabBar() {
         window.electron.switchTab(id);
     };
 
+    const handleDragStart = (e: React.DragEvent, id: number) => {
+        setDraggedTabId(id);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e: React.DragEvent, _id: number) => {
+        e.preventDefault();
+    };
+
+    const handleDrop = (e: React.DragEvent, targetId: number) => {
+        e.preventDefault();
+        if (draggedTabId === null || draggedTabId === targetId) return;
+
+        const draggedIndex = tabs.findIndex(t => t.id === draggedTabId);
+        const targetIndex = tabs.findIndex(t => t.id === targetId);
+
+        const newTabs = [...tabs];
+        const [draggedTab] = newTabs.splice(draggedIndex, 1);
+        newTabs.splice(targetIndex, 0, draggedTab);
+
+        setTabs(newTabs);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedTabId(null);
+    };
+
     return (
         <div className="tab-bar">
             <div className="traffic-lights">
@@ -67,6 +95,10 @@ export function TabBar() {
                         isActive={tab.id === activeTabId}
                         onSelect={handleSelectTab}
                         onClose={handleCloseTab}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        onDragEnd={handleDragEnd}
                     />
                 ))}
                 <button className="tab-new" onClick={handleNewTab}>
