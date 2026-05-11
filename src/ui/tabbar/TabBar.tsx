@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Tab } from './Tab';
 import './Tabs.css';
 
@@ -12,13 +12,49 @@ export function TabBar() {
     const [activeTabId, setActiveTabId] = useState<number | null>(null);
     const [draggedTabId, setDraggedTabId] = useState<number | null>(null);
     const [dragOverTabId, setDragOverTabId] = useState<number | null>(null);
+    const draggedTabRef = useRef<TabData | null>(null);
 
     useEffect(() => {
+        // Initial tab load
         window.electron.getFirstTabId().then((id) => {
-            setTabs([{ id, label: 'Tab 1' }]);
-            setActiveTabId(id);
+            if (id !== 0) {
+                setTabs([{ id, label: 'Tab 1' }]);
+                setActiveTabId(id);
+            }
         });
-    }, []);
+
+        // Listen for init-tabs from main (for new windows after tear-away)
+        const unsubscribeInit = window.electron.onInitTabs((newTabs) => {
+            setTabs(newTabs);
+            if (newTabs.length > 0) {
+                setActiveTabId(newTabs[0].id);
+                window.electron.switchTab(newTabs[0].id);
+            }
+        });
+
+        // Listen for remove-tab from main (when tab is torn away)
+        const unsubscribeRemove = window.electron.onRemoveTab((tabId) => {
+            setTabs((prevTabs) => {
+                const index = prevTabs.findIndex((t) => t.id === tabId);
+                const newTabs = prevTabs.filter((t) => t.id !== tabId);
+
+                // If removed tab was active, switch to adjacent
+                if (activeTabId === tabId && newTabs.length > 0) {
+                    const newActiveIndex = Math.min(index, newTabs.length - 1);
+                    const newActiveId = newTabs[newActiveIndex].id;
+                    setActiveTabId(newActiveId);
+                    window.electron.switchTab(newActiveId);
+                }
+
+                return newTabs;
+            });
+        });
+
+        return () => {
+            unsubscribeInit();
+            unsubscribeRemove();
+        };
+    }, [activeTabId]);
 
     const handleNewTab = async () => {
         const id = await window.electron.newTab();
@@ -29,7 +65,7 @@ export function TabBar() {
 
     const handleCloseTab = (id: number) => {
         const index = tabs.findIndex((tab) => tab.id === id);
-        
+
         let tabToSwitchTo: number;
         if (tabs.length === 1) {
             tabToSwitchTo = id;
@@ -55,6 +91,7 @@ export function TabBar() {
 
     const handleDragStart = (e: React.DragEvent, id: number) => {
         setDraggedTabId(id);
+        draggedTabRef.current = tabs.find((t) => t.id === id) || null;
         e.dataTransfer.effectAllowed = 'move';
     };
 
@@ -69,8 +106,8 @@ export function TabBar() {
         e.preventDefault();
         if (draggedTabId === null || draggedTabId === targetId) return;
 
-        const draggedIndex = tabs.findIndex(t => t.id === draggedTabId);
-        const targetIndex = tabs.findIndex(t => t.id === targetId);
+        const draggedIndex = tabs.findIndex((t) => t.id === draggedTabId);
+        const targetIndex = tabs.findIndex((t) => t.id === targetId);
 
         const newTabs = [...tabs];
         const [draggedTab] = newTabs.splice(draggedIndex, 1);
@@ -80,9 +117,33 @@ export function TabBar() {
         setDragOverTabId(null);
     };
 
-    const handleDragEnd = () => {
+    const handleDragEnd = async (e: React.DragEvent) => {
+        const draggedTab = draggedTabRef.current;
+
+        // Check if drag ended outside window (tear-away)
+        if (draggedTab && tabs.length > 1) {
+            const bounds = await window.electron.getWindowBounds();
+            const { screenX, screenY } = e;
+
+            const isOutside =
+                screenX < bounds.x ||
+                screenX > bounds.x + bounds.width ||
+                screenY < bounds.y ||
+                screenY > bounds.y + bounds.height;
+
+            if (isOutside) {
+                window.electron.tearAwayTab(
+                    draggedTab.id,
+                    draggedTab.label,
+                    screenX,
+                    screenY
+                );
+            }
+        }
+
         setDraggedTabId(null);
         setDragOverTabId(null);
+        draggedTabRef.current = null;
     };
 
     const handleDragLeave = (e: React.DragEvent) => {

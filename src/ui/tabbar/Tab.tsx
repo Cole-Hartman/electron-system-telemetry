@@ -11,7 +11,7 @@ type TabProps = {
     onDragStart: (e: React.DragEvent, id: number) => void;
     onDragOver: (e: React.DragEvent, id: number) => void;
     onDrop: (e: React.DragEvent, id: number) => void;
-    onDragEnd: () => void;
+    onDragEnd: (e: React.DragEvent) => void;
 };
 
 export function Tab({ id, label, isActive, isDragging, isDropTarget, onSelect, onClose, onDragStart, onDragOver, onDrop, onDragEnd }: TabProps) {
@@ -28,7 +28,7 @@ export function Tab({ id, label, isActive, isDragging, isDropTarget, onSelect, o
             onDragStart={(e) => onDragStart(e, id)}
             onDragOver={(e) => onDragOver(e, id)}
             onDrop={(e) => onDrop(e, id)}
-            onDragEnd={onDragEnd}
+            onDragEnd={(e) => onDragEnd(e)}
         >
             <span className="tab-label">{label}</span>
             <button

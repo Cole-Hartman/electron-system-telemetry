@@ -1,6 +1,6 @@
 import { app, BaseWindow } from "electron";
 import { ipcWebContentsSend } from "./util.js";
-import { getContentViews } from "./view.js";
+import { getAllWindows } from "./windowManager.js";
 
 const PROTOCOL = 'telemetry-app'
 
@@ -35,8 +35,16 @@ export function setMainWindowForDeepLink(win: BaseWindow) {
 
 export function handleDeepLink(pendingDeepLink: string) {
     const parsed = new URL(pendingDeepLink)
-    const views = getContentViews();
-    const view = views[views.length - 1]; // deep link to the most recently created view
+
+    // Get all content views from all windows and use the most recent one
+    const allWindows = getAllWindows();
+    let view = null;
+    for (const data of allWindows.values()) {
+        if (data.contentViews.length > 0) {
+            view = data.contentViews[data.contentViews.length - 1];
+        }
+    }
+
     if (!view) {
         return;
     }

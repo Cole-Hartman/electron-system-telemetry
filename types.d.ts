@@ -18,6 +18,18 @@ type View = 'CPU' | 'RAM' | 'DISK';
 
 type FrameWindowAction = 'CLOSE' | 'MINIMIZE' | 'MAXIMIZE';
 
+type WindowBounds = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+type TabData = {
+    id: number;
+    label: string;
+};
+
 // Type for type safe adapter pattern
 type EventPayloadMapping = {
     statistics: Statistics;
@@ -28,7 +40,11 @@ type EventPayloadMapping = {
     switchTab: number;
     getViewId: number;
     getFirstTabId: number;
-    closeTab: { id: number, tabToSwitchTo: number };
+    closeTab: { id: number; tabToSwitchTo: number };
+    getWindowBounds: WindowBounds;
+    tearAwayTab: { tabId: number; label: string; screenX: number; screenY: number };
+    initTabs: TabData[];
+    removeTab: number;
 }
 
 /*
@@ -40,7 +56,7 @@ Window already has a type, so we just extend it with an interface to add our new
 */
 interface Window {
     electron: {
-        // subscribeStatistics is a function that takes a callback and returns void 
+        // subscribeStatistics is a function that takes a callback and returns void
         // the callback takes a statistics object and returns void
         subscribeStatistics: (callback: (statistics: Statistics) => void) => UnsubscribeFunction;
         // getStaticData is a function that returns a promise that
@@ -53,6 +69,11 @@ interface Window {
         closeTab: (id: number, tabToSwitchTo: number) => void;
         getViewId: () => Promise<number>;
         getFirstTabId: () => Promise<number>;
+        // Tear-away tabs
+        getWindowBounds: () => Promise<WindowBounds>;
+        tearAwayTab: (tabId: number, label: string, screenX: number, screenY: number) => void;
+        onInitTabs: (callback: (tabs: TabData[]) => void) => UnsubscribeFunction;
+        onRemoveTab: (callback: (tabId: number) => void) => UnsubscribeFunction;
     }
 }
 
