@@ -6,7 +6,7 @@ Implementation is ordered by dependency: first restructure main process for mult
 
 ## Phase 1: Window Manager Infrastructure
 
-### [ ] T-001: Create window manager module
+### [x] T-001: Create window manager module
 Create `src/electron/windowManager.ts` to track multiple windows. Define a `WindowData` type containing `baseWindow`, `tabBarView`, and `contentViews[]`. Export a `Map<number, WindowData>` and helper functions `registerWindow()`, `unregisterWindow()`, `getWindowData()`, `findViewOwner(tabId)`.
 
 Acceptance Criteria:
@@ -14,7 +14,7 @@ Acceptance Criteria:
 - `findViewOwner(tabId)` returns the windowId and view for a given tab ID
 - Typecheck passes
 
-### [ ] T-002: Refactor view.ts to use window manager
+### [x] T-002: Refactor view.ts to use window manager
 Update `view.ts` to use the window manager instead of module-level `contentViews[]`. Modify `createContentView()` to register views with the correct window. Update `switchToView()` and `closeTab()` to look up views via window manager.
 
 Acceptance Criteria:
@@ -24,7 +24,7 @@ Acceptance Criteria:
 - Typecheck passes
 - Verify changes work in browser
 
-### [ ] T-003: Register initial window with window manager
+### [x] T-003: Register initial window with window manager
 Update `main.ts` to register the initial BaseWindow with the window manager after creation. Pass window ID to `createTabBarView()` and `createContentView()` so they can register with the correct window.
 
 Acceptance Criteria:
@@ -36,7 +36,7 @@ Acceptance Criteria:
 
 ## Phase 2: Preload and IPC Setup
 
-### [ ] T-004: Add getWindowBounds preload method
+### [x] T-004: Add getWindowBounds preload method
 Add `getWindowBounds()` to preload that returns the current window's screen bounds (x, y, width, height). Add corresponding IPC handler in main that gets bounds from the sender's parent BaseWindow.
 
 Acceptance Criteria:
@@ -44,7 +44,7 @@ Acceptance Criteria:
 - Bounds reflect actual window position on screen
 - Typecheck passes
 
-### [ ] T-005: Add tearAwayTab preload method
+### [x] T-005: Add tearAwayTab preload method
 Add `tearAwayTab(tabId, label, screenX, screenY)` to preload. Add corresponding IPC handler in main that will coordinate the tear-away (implementation in later task).
 
 Acceptance Criteria:
@@ -52,7 +52,7 @@ Acceptance Criteria:
 - IPC handler receives parameters (can be stub for now)
 - Typecheck passes
 
-### [ ] T-006: Add init-tabs IPC listener in TabBar
+### [x] T-006: Add init-tabs IPC listener in TabBar
 Add an IPC listener in TabBar.tsx that receives `init-tabs` message with array of `{id, label}`. When received, set the tabs state. This allows main to initialize a new TabBar with its tabs.
 
 Acceptance Criteria:
@@ -61,7 +61,7 @@ Acceptance Criteria:
 - Listener is cleaned up on unmount
 - Typecheck passes
 
-### [ ] T-007: Add remove-tab IPC listener in TabBar
+### [x] T-007: Add remove-tab IPC listener in TabBar
 Add an IPC listener in TabBar.tsx that receives `remove-tab` message with a tab ID. When received, remove that tab from local state. This allows main to tell source window to remove a torn-away tab.
 
 Acceptance Criteria:
@@ -73,7 +73,7 @@ Acceptance Criteria:
 
 ## Phase 3: Tear-Away Detection
 
-### [ ] T-008: Detect tear-away in handleDragEnd
+### [x] T-008: Detect tear-away in handleDragEnd
 Update `handleDragEnd` in TabBar.tsx to check if drag ended outside window bounds. Get window bounds via `getWindowBounds()`, compare with `dragend` event's screenX/screenY. If outside bounds and more than one tab exists, call `tearAwayTab()`.
 
 Acceptance Criteria:
@@ -86,7 +86,7 @@ Acceptance Criteria:
 
 ## Phase 4: Window Creation and View Transfer
 
-### [ ] T-009: Implement createNewWindow in window manager
+### [x] T-009: Implement createNewWindow in window manager
 Add `createNewWindow(x, y, width, height)` to window manager. Creates a new BaseWindow at the specified position and size, creates a TabBar view for it, registers it in the window map, and returns the window ID.
 
 Acceptance Criteria:
@@ -96,7 +96,7 @@ Acceptance Criteria:
 - Returns new window ID
 - Typecheck passes
 
-### [ ] T-010: Implement view transfer in tearAwayTab handler
+### [x] T-010: Implement view transfer in tearAwayTab handler
 Complete the `tearAwayTab` IPC handler. Find source window and view via window manager. Create new window via `createNewWindow()`. Remove view from source window's contentView and contentViews array. Add view to new window. Send `remove-tab` to source TabBar. Send `init-tabs` to new TabBar after it loads.
 
 Acceptance Criteria:
@@ -110,7 +110,7 @@ Acceptance Criteria:
 
 ## Phase 5: Window Lifecycle
 
-### [ ] T-011: Handle window close cleanup
+### [x] T-011: Handle window close cleanup
 Add close event handler for each BaseWindow that unregisters it from window manager and cleans up its views. If it's the last window, quit the app.
 
 Acceptance Criteria:
@@ -121,7 +121,7 @@ Acceptance Criteria:
 - Typecheck passes
 - Verify changes work in browser
 
-### [ ] T-012: Update frame actions for multi-window
+### [x] T-012: Update frame actions for multi-window
 Update `sendFrameAction` handler to close/minimize/maximize the correct window (the one that sent the IPC), not just mainWindow.
 
 Acceptance Criteria:
