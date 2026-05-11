@@ -19,11 +19,17 @@ electron.contextBridge.exposeInMainWorld('electron', {
     closeTab: (id: number, tabToSwitchTo: number) => ipcSend("closeTab", { id, tabToSwitchTo }),
     getViewId: () => ipcInvoke("getViewId"),
     getFirstTabId: () => ipcInvoke("getFirstTabId"),
-    // close: (id: number) => ipcRenderer.invoke('tabs:close', id),
-    // select: (id: number) => ipcRenderer.invoke('tabs:select', id),
-    // getAllTabIds: () => ipcRenderer.invoke('tabs:getAllTabIds'),
-    // getSelectedTabId: () => ipcRenderer.invoke('tabs:getSelectedTabId'),
-    // reorder: (tabIds: number[]) => ipcRenderer.invoke('tabs:reorder', tabIds),
+
+    // TEAR-AWAY TABS
+    getWindowBounds: () => ipcInvoke("getWindowBounds"),
+    tearAwayTab: (tabId: number, label: string, screenX: number, screenY: number) =>
+        ipcSend("tearAwayTab", { tabId, label, screenX, screenY }),
+    onInitTabs: (callback: (tabs: Array<{ id: number; label: string }>) => void) => {
+        return ipcOn("initTabs", callback);
+    },
+    onRemoveTab: (callback: (tabId: number) => void) => {
+        return ipcOn("removeTab", callback);
+    },
 
 } satisfies Window['electron']);
 // satisfies - tells TS to expect this object to match type x. 

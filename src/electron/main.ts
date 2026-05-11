@@ -1,51 +1,53 @@
 import { app, BaseWindow } from "electron";
-import { pollResources, } from "./resourceManager.js";
+import { pollResources } from "./resourceManager.js";
 import { createTray } from "./tray.js";
 import { createMenu } from "./menu.js";
-import { createTabBarView, createContentView, getContentViews, TABBAR_HEIGHT } from "./view.js";
+import { createTabBarView, createContentView, updateViewBounds } from "./view.js";
 import { registerProtocol, setMainWindowForDeepLink } from "./protocol.js";
 import { initIpcHandlers } from "./ipcHandlers.js";
+import { registerWindow, unregisterWindow, getWindowCount } from "./windowManager.js";
 
 registerProtocol();
 
 app.whenReady().then(() => {
     const mainWindow = new BaseWindow({ width: 800, height: 600, frame: false });
+    const windowId = mainWindow.id;
 
     // Create tabbar view first (chrome)
     const tabBarView = createTabBarView(mainWindow);
+
+    // Register window with window manager
+    registerWindow(windowId, mainWindow, tabBarView);
+
     // Create initial content view
-    const contentView = createContentView(mainWindow);
+    const contentView = createContentView(mainWindow, windowId);
     pollResources(contentView);
 
-    initIpcHandlers(mainWindow);
+    initIpcHandlers();
     setMainWindowForDeepLink(mainWindow);
 
     createTray(mainWindow);
     createMenu(mainWindow, contentView);
-    handleCloseEvents(mainWindow);
+    handleCloseEvents(mainWindow, windowId);
 
     // Single resize listener for all views
     mainWindow.on('resize', () => {
-        const { width, height } = mainWindow.getContentBounds();
-        tabBarView.setBounds({ x: 0, y: 0, width, height: TABBAR_HEIGHT });
-        for (const view of getContentViews()) {
-            view.setBounds({ x: 0, y: TABBAR_HEIGHT, width, height: height - TABBAR_HEIGHT });
-        }
+        updateViewBounds(windowId);
     });
 });
 
 /**
  * Handle the quitting events of the main window
  * Allows the user to close the window without quitting the app
- * 
+ *
  * Ways of closing the app and their event order:
  * 1. Closing main window manually: 'close' event ->'before-quit' event -> app quits
  *    - on manual close, prevent the app from quitting and hide the window
- * 
+ *
  * 2. Clicking the close button (app.quit()): 'before-quit' event -> 'close' event -> app quits
  *    - on quit, allow the app to quit
  */
-function handleCloseEvents(mainWindow: BaseWindow) {
+function handleCloseEvents(mainWindow: BaseWindow, windowId: number) {
     let willClose = false;
 
     mainWindow.on('close', (event) => {
@@ -69,6 +71,11 @@ function handleCloseEvents(mainWindow: BaseWindow) {
     mainWindow.on('show', () => {
         willClose = false;
     })
+
+    mainWindow.on('closed', () => {
+        unregisterWindow(windowId);
+        if (getWindowCount() === 0) {
+            app.quit();
+        }
+    });
 }
-
-

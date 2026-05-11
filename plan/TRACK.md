@@ -1,72 +1,142 @@
-# Tab Reordering Implementation Track
+# Tear-Away Tabs Implementation Track
 
 ## Overview
 
-Implementation is ordered by functionality layers: first add drag capability to Tab component, then add drop handling and reorder logic to TabBar, then add visual feedback styles. Each phase builds on the previous.
+Implementation is ordered by dependency: first restructure main process for multi-window support, then add IPC/preload methods, then implement tear-away detection in renderer, then handle window creation and view transfer, and finally sync TabBar state.
 
-## Phase 1: Core Drag and Drop
+## Phase 1: Window Manager Infrastructure
 
-### [x] T-001: Add drag event props to Tab component
-Extend Tab.tsx to accept drag event handler props (`onDragStart`, `onDragOver`, `onDrop`, `onDragEnd`) and add the `draggable` attribute. Pass the tab `id` to each handler so TabBar can identify which tab is being dragged or dropped on.
+### [x] T-001: Create window manager module
+Create `src/electron/windowManager.ts` to track multiple windows. Define a `WindowData` type containing `baseWindow`, `tabBarView`, and `contentViews[]`. Export a `Map<number, WindowData>` and helper functions `registerWindow()`, `unregisterWindow()`, `getWindowData()`, `findViewOwner(tabId)`.
 
 Acceptance Criteria:
-- Tab component accepts `onDragStart`, `onDragOver`, `onDrop`, `onDragEnd` props
-- Tab element has `draggable` attribute set to true
-- Each handler receives the tab's `id` as an argument
-- Existing `onClick` behavior still works
+- `windowManager.ts` exports window tracking Map and helper functions
+- `findViewOwner(tabId)` returns the windowId and view for a given tab ID
 - Typecheck passes
 
-### [x] T-002: Implement reorder logic in TabBar
-Add state for `draggedTabId` in TabBar.tsx. Implement handlers: `handleDragStart` sets the dragged tab, `handleDrop` reorders the `tabs` array by moving the dragged tab to the target position, `handleDragEnd` clears drag state. Pass handlers to Tab components.
+### [x] T-002: Refactor view.ts to use window manager
+Update `view.ts` to use the window manager instead of module-level `contentViews[]`. Modify `createContentView()` to register views with the correct window. Update `switchToView()` and `closeTab()` to look up views via window manager.
 
 Acceptance Criteria:
-- Dragging a tab and dropping on another tab reorders the array
-- Tab moves to the drop target's position (insert, not swap)
-- Dropping a tab on itself does nothing
-- `draggedTabId` state is cleared after drag ends
+- `contentViews[]` module variable removed from view.ts
+- All view operations use window manager
+- Existing tab functionality still works (create, switch, close)
 - Typecheck passes
 - Verify changes work in browser
 
-## Phase 2: Visual Feedback
-
-### [x] T-003: Add ghost effect to dragged tab
-Add CSS class `tab-dragging` applied to the tab being dragged. Style it with reduced opacity to create a ghost effect. Track `draggedTabId` in TabBar and pass `isDragging` prop to Tab to conditionally apply the class.
+### [x] T-003: Register initial window with window manager
+Update `main.ts` to register the initial BaseWindow with the window manager after creation. Pass window ID to `createTabBarView()` and `createContentView()` so they can register with the correct window.
 
 Acceptance Criteria:
-- Tab being dragged has reduced opacity (0.5 or similar)
-- Other tabs remain at full opacity
-- Ghost effect clears when drag ends
+- Initial window is registered in window manager on app start
+- Window ID is available for view registration
+- App starts and functions normally
 - Typecheck passes
 - Verify changes work in browser
 
-### [x] T-004: Add drop indicator for target position
-Track `dragOverTabId` state in TabBar, updated on `handleDragOver`. Pass `isDropTarget` prop to Tab. Add CSS for drop indicator (left border or highlight) on the drop target tab. Clear `dragOverTabId` on drag end or drop.
+## Phase 2: Preload and IPC Setup
+
+### [x] T-004: Add getWindowBounds preload method
+Add `getWindowBounds()` to preload that returns the current window's screen bounds (x, y, width, height). Add corresponding IPC handler in main that gets bounds from the sender's parent BaseWindow.
 
 Acceptance Criteria:
-- Visual indicator appears on the tab being hovered during drag
-- Indicator shows where the dragged tab will be inserted
-- Indicator clears immediately when drag ends or completes
-- Indicator does not appear when hovering over the dragged tab itself
+- `window.electron.getWindowBounds()` returns `{ x, y, width, height }`
+- Bounds reflect actual window position on screen
+- Typecheck passes
+
+### [x] T-005: Add tearAwayTab preload method
+Add `tearAwayTab(tabId, label, screenX, screenY)` to preload. Add corresponding IPC handler in main that will coordinate the tear-away (implementation in later task).
+
+Acceptance Criteria:
+- `window.electron.tearAwayTab()` sends IPC to main with all parameters
+- IPC handler receives parameters (can be stub for now)
+- Typecheck passes
+
+### [x] T-006: Add init-tabs IPC listener in TabBar
+Add an IPC listener in TabBar.tsx that receives `init-tabs` message with array of `{id, label}`. When received, set the tabs state. This allows main to initialize a new TabBar with its tabs.
+
+Acceptance Criteria:
+- TabBar listens for `init-tabs` IPC message on mount
+- Receiving message sets tabs state with provided data
+- Listener is cleaned up on unmount
+- Typecheck passes
+
+### [x] T-007: Add remove-tab IPC listener in TabBar
+Add an IPC listener in TabBar.tsx that receives `remove-tab` message with a tab ID. When received, remove that tab from local state. This allows main to tell source window to remove a torn-away tab.
+
+Acceptance Criteria:
+- TabBar listens for `remove-tab` IPC message
+- Receiving message removes tab with matching ID from state
+- If removed tab was active, switches to adjacent tab
+- Listener is cleaned up on unmount
+- Typecheck passes
+
+## Phase 3: Tear-Away Detection
+
+### [x] T-008: Detect tear-away in handleDragEnd
+Update `handleDragEnd` in TabBar.tsx to check if drag ended outside window bounds. Get window bounds via `getWindowBounds()`, compare with `dragend` event's screenX/screenY. If outside bounds and more than one tab exists, call `tearAwayTab()`.
+
+Acceptance Criteria:
+- Drag ending inside window works as before (no tear-away)
+- Drag ending outside window triggers tear-away (when >1 tab)
+- Drag ending outside with only 1 tab does not tear away
+- Label is passed along with tab ID
 - Typecheck passes
 - Verify changes work in browser
 
-## Phase 3: Edge Cases
+## Phase 4: Window Creation and View Transfer
 
-### [x] T-005: Handle drag cancellation outside tab list
-Use `onDragEnd` to detect when drag ends without a valid drop (dropped outside tab list). Ensure tab order remains unchanged and all drag state is cleared. The `onDragEnd` event fires regardless of drop success.
+### [x] T-009: Implement createNewWindow in window manager
+Add `createNewWindow(x, y, width, height)` to window manager. Creates a new BaseWindow at the specified position and size, creates a TabBar view for it, registers it in the window map, and returns the window ID.
 
 Acceptance Criteria:
-- Dragging a tab outside the tab list and releasing cancels the drag
-- Tab order remains unchanged after cancelled drag
-- All visual feedback (ghost, drop indicator) clears on cancel
-- No console errors on drag cancel
+- New BaseWindow created at specified screen position
+- New TabBar view created and added to window
+- Window registered in window manager map
+- Returns new window ID
+- Typecheck passes
+
+### [x] T-010: Implement view transfer in tearAwayTab handler
+Complete the `tearAwayTab` IPC handler. Find source window and view via window manager. Create new window via `createNewWindow()`. Remove view from source window's contentView and contentViews array. Add view to new window. Send `remove-tab` to source TabBar. Send `init-tabs` to new TabBar after it loads.
+
+Acceptance Criteria:
+- View is removed from source window
+- View is added to new window and visible
+- Source TabBar receives remove-tab message
+- New TabBar receives init-tabs message with correct tab data
+- View content is preserved (no reload)
+- Typecheck passes
+- Verify changes work in browser
+
+## Phase 5: Window Lifecycle
+
+### [x] T-011: Handle window close cleanup
+Add close event handler for each BaseWindow that unregisters it from window manager and cleans up its views. If it's the last window, quit the app.
+
+Acceptance Criteria:
+- Closing a window removes it from window manager
+- WebContents of closed window's views are destroyed
+- Closing last window quits the app
+- No memory leaks from orphaned views
+- Typecheck passes
+- Verify changes work in browser
+
+### [x] T-012: Update frame actions for multi-window
+Update `sendFrameAction` handler to close/minimize/maximize the correct window (the one that sent the IPC), not just mainWindow.
+
+Acceptance Criteria:
+- Traffic light buttons affect their own window
+- Each window can be independently minimized/maximized/closed
 - Typecheck passes
 - Verify changes work in browser
 
 ## Dependencies & Notes
 
-- T-001 must complete before T-002 (Tab needs drag props before TabBar can use them)
-- T-002 must complete before T-003, T-004, T-005 (core logic before polish)
-- T-003 and T-004 can be done in parallel after T-002
-- T-005 depends on T-003 and T-004 (tests that visual cleanup works)
-- Reuse existing `tab` and `tab-active` CSS class patterns for new states
+- T-001 must complete before T-002, T-003
+- T-002, T-003 must complete before T-004 through T-007
+- T-004, T-005 must complete before T-008
+- T-006, T-007 must complete before T-010
+- T-008, T-009 must complete before T-010
+- T-010 must complete before T-011, T-012
+- Preserve existing tab reorder functionality throughout
+- Tab ID equals webContents.id - use this for view lookup
