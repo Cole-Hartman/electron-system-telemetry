@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
+import { SelectOption } from './SelectOption';
 
 function App() {
   const staticData = useStaticData();
@@ -25,14 +26,25 @@ function App() {
 
   const activeUsages = useMemo(() => {
     switch (activeView) {
-      case 'CPU':
-        return cpuUsages;
-      case 'RAM':
-        return ramUsages;
-      case 'DISK':
-        return storageUsages;
+      case 'CPU': return cpuUsages;
+      case 'RAM': return ramUsages;
+      case 'DISK': return storageUsages;
     }
   }, [activeView, cpuUsages, ramUsages, storageUsages]);
+
+  const activeSubtitle = useMemo(() => {
+    switch (activeView) {
+      case 'CPU': return staticData?.cpuModel ?? '';
+      case 'RAM': return (staticData?.totalMemoryGB?.toString() ?? '') + ' GB';
+      case 'DISK': return (staticData?.totalStorage?.toString() ?? '') + ' GB';
+    }
+  }, [activeView, staticData]);
+
+  const currentUsage = activeUsages.length > 0
+    ? Math.round(activeUsages[activeUsages.length - 1] * 100)
+    : 0;
+
+  const viewClass = activeView.toLowerCase();
 
   const [viewId, setViewId] = useState<number | null>(null);
   useEffect(() => {
@@ -54,51 +66,43 @@ function App() {
             view="CPU"
             subTitle={staticData?.cpuModel ?? ''}
             data={cpuUsages}
+            activeView={activeView}
           />
           <SelectOption
             onClick={() => setActiveView('RAM')}
             title="RAM"
             view="RAM"
-            subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
+            subTitle={(staticData?.totalMemoryGB?.toString() ?? '') + ' GB'}
             data={ramUsages}
+            activeView={activeView}
           />
           <SelectOption
             onClick={() => setActiveView('DISK')}
             title="DISK"
             view="DISK"
-            subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
+            subTitle={(staticData?.totalStorage?.toString() ?? '') + ' GB'}
             data={storageUsages}
+            activeView={activeView}
           />
         </div>
-        <div className="mainGrid">
-          <Chart
-            selectedView={activeView}
-            data={activeUsages}
-            maxDataPoints={10}
-          />
+        <div className={`chartCard ${viewClass}`}>
+          <div className="chartCardHeader">
+            <div>
+              <div className="chartCardTitle">{activeView}</div>
+              <div className="chartCardSubtitle">{activeSubtitle}</div>
+            </div>
+            <div className={`chartCardValue ${viewClass}`}>{currentUsage}%</div>
+          </div>
+          <div className="chartCardChart">
+            <Chart
+              selectedView={activeView}
+              data={activeUsages}
+              maxDataPoints={10}
+            />
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function SelectOption(props: {
-  title: string;
-  view: View;
-  subTitle: string;
-  data: number[];
-  onClick: () => void;
-}) {
-  return (
-    <button className="selectOption" onClick={props.onClick}>
-      <div className="selectOptionTitle">
-        <div>{props.title}</div>
-        <div>{props.subTitle}</div>
-      </div>
-      <div className="selectOptionChart">
-        <Chart selectedView={props.view} data={props.data} maxDataPoints={10} />
-      </div>
-    </button>
   );
 }
 
