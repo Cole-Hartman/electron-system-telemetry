@@ -26,14 +26,25 @@ function App() {
 
   const activeUsages = useMemo(() => {
     switch (activeView) {
-      case 'CPU':
-        return cpuUsages;
-      case 'RAM':
-        return ramUsages;
-      case 'DISK':
-        return storageUsages;
+      case 'CPU': return cpuUsages;
+      case 'RAM': return ramUsages;
+      case 'DISK': return storageUsages;
     }
   }, [activeView, cpuUsages, ramUsages, storageUsages]);
+
+  const activeSubtitle = useMemo(() => {
+    switch (activeView) {
+      case 'CPU': return staticData?.cpuModel ?? '';
+      case 'RAM': return (staticData?.totalMemoryGB?.toString() ?? '') + ' GB';
+      case 'DISK': return (staticData?.totalStorage?.toString() ?? '') + ' GB';
+    }
+  }, [activeView, staticData]);
+
+  const currentUsage = activeUsages.length > 0
+    ? Math.round(activeUsages[activeUsages.length - 1] * 100)
+    : 0;
+
+  const viewClass = activeView.toLowerCase();
 
   const [viewId, setViewId] = useState<number | null>(null);
   useEffect(() => {
@@ -61,7 +72,7 @@ function App() {
             onClick={() => setActiveView('RAM')}
             title="RAM"
             view="RAM"
-            subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
+            subTitle={(staticData?.totalMemoryGB?.toString() ?? '') + ' GB'}
             data={ramUsages}
             activeView={activeView}
           />
@@ -69,17 +80,26 @@ function App() {
             onClick={() => setActiveView('DISK')}
             title="DISK"
             view="DISK"
-            subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
+            subTitle={(staticData?.totalStorage?.toString() ?? '') + ' GB'}
             data={storageUsages}
             activeView={activeView}
           />
         </div>
-        <div className="mainGrid">
-          <Chart
-            selectedView={activeView}
-            data={activeUsages}
-            maxDataPoints={10}
-          />
+        <div className={`chartCard ${viewClass}`}>
+          <div className="chartCardHeader">
+            <div>
+              <div className="chartCardTitle">{activeView}</div>
+              <div className="chartCardSubtitle">{activeSubtitle}</div>
+            </div>
+            <div className={`chartCardValue ${viewClass}`}>{currentUsage}%</div>
+          </div>
+          <div className="chartCardChart">
+            <Chart
+              selectedView={activeView}
+              data={activeUsages}
+              maxDataPoints={10}
+            />
+          </div>
         </div>
       </div>
     </div>

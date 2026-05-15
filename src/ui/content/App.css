@@ -15,9 +15,54 @@
   margin-top: var(--space-md);
 }
 
-.mainGrid {
-  height: 10rem;
-  padding: var(--space-xs);
+.chartCard {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.chartCard.cpu { border-left-color: var(--color-cpu-stroke); }
+.chartCard.ram { border-left-color: var(--color-ram-stroke); }
+.chartCard.disk { border-left-color: var(--color-disk-stroke); }
+
+.chartCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.chartCardTitle {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.chartCardSubtitle {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+.chartCardValue {
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.chartCardValue.cpu { color: var(--color-cpu-stroke); }
+.chartCardValue.ram { color: var(--color-ram-stroke); }
+.chartCardValue.disk { color: var(--color-disk-stroke); }
+
+.chartCardChart {
+  height: 8rem;
+  width: 100%;
 }
 
 .selectOption {
