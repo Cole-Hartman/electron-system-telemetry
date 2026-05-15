@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { useStatistics } from './useStatistics';
 import { Chart } from './Chart';
+import { SelectOption } from './SelectOption';
 
 function App() {
   const staticData = useStaticData();
@@ -54,6 +55,7 @@ function App() {
             view="CPU"
             subTitle={staticData?.cpuModel ?? ''}
             data={cpuUsages}
+            activeView={activeView}
           />
           <SelectOption
             onClick={() => setActiveView('RAM')}
@@ -61,6 +63,7 @@ function App() {
             view="RAM"
             subTitle={(staticData?.totalMemoryGB.toString() ?? '') + ' GB'}
             data={ramUsages}
+            activeView={activeView}
           />
           <SelectOption
             onClick={() => setActiveView('DISK')}
@@ -68,6 +71,7 @@ function App() {
             view="DISK"
             subTitle={(staticData?.totalStorage.toString() ?? '') + ' GB'}
             data={storageUsages}
+            activeView={activeView}
           />
         </div>
         <div className="mainGrid">
@@ -79,26 +83,6 @@ function App() {
         </div>
       </div>
     </div>
-  );
-}
-
-function SelectOption(props: {
-  title: string;
-  view: View;
-  subTitle: string;
-  data: number[];
-  onClick: () => void;
-}) {
-  return (
-    <button className="selectOption" onClick={props.onClick}>
-      <div className="selectOptionTitle">
-        <div>{props.title}</div>
-        <div>{props.subTitle}</div>
-      </div>
-      <div className="selectOptionChart">
-        <Chart selectedView={props.view} data={props.data} maxDataPoints={10} />
-      </div>
-    </button>
   );
 }
 

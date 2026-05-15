@@ -1,57 +1,87 @@
 .view-id {
   text-align: center;
-  padding: 0.5rem;
-  color: #888;
+  padding: var(--space-xs);
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
 .main {
   display: grid;
   grid-template-columns: 16rem auto;
-  gap: 1rem;
+  gap: var(--space-md);
   align-items: center;
-  margin: 1rem;
   max-width: 900px;
   margin: auto;
-  margin-top: 1rem;
+  margin-top: var(--space-md);
 }
 
 .mainGrid {
   height: 10rem;
-  padding: 0.5rem;
+  padding: var(--space-xs);
 }
 
 .selectOption {
   display: block;
-  padding: 0.5rem;
+  padding: var(--space-sm);
   width: 100%;
-  background-color: #2c2c2c;
-  margin: 0.5rem 0;
-  border-radius: 0.5rem;
+  background-color: var(--color-surface);
+  margin: var(--space-xs) 0;
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
   cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .selectOption:hover {
-  background-color: #333;
+  background-color: var(--color-surface-hover);
 }
 
-.selectOptionTitle {
+.selectOption.active.cpu { border-left-color: var(--color-cpu-stroke); }
+.selectOption.active.ram { border-left-color: var(--color-ram-stroke); }
+.selectOption.active.disk { border-left-color: var(--color-disk-stroke); }
+
+.selectOption.active {
+  background-color: var(--color-surface-hover);
+}
+
+.selectOptionHeader {
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-.selectOptionTitle :first-child {
-  font-weight: 600;
+.selectOptionLabel {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
 }
 
-.selectOptionTitle :nth-child(2) {
-  font-weight: 400;
-  font-size: 0.8rem;
+.selectOptionUsage {
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.selectOptionUsage.cpu { color: var(--color-cpu-stroke); }
+.selectOptionUsage.ram { color: var(--color-ram-stroke); }
+.selectOptionUsage.disk { color: var(--color-disk-stroke); }
+
+.selectOptionSubtitle {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .selectOptionChart {
-  height: 2rem;
+  height: 2.5rem;
   width: 100%;
+  margin-top: var(--space-xs);
 }
 
 .selectOptionChart * {
